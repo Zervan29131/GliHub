@@ -1,83 +1,48 @@
 <template>
-  <div>
-    1232123123123
-    <el-card class="box-card">
-      <h2>登录</h2>
-      <el-form
-        :model="ruleForm"
-        status-icon
-        :rules="rules"
-        ref="ruleForm"
-        label-position="left"
-        label-width="70px"
-        class="login-from"
-      >
-        <el-form-item label="用户名" prop="uname">
-          <el-input v-model="ruleForm.uname"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input
-            type="password"
-            v-model="ruleForm.password"
-            autocomplete="off"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <div class="btnGroup">
-        <el-button type="primary" @click="submitForm('ruleForm')"
-          >登录</el-button
-        >
-        <el-button @click="resetForm('ruleForm')">重置</el-button>
-        <router-link to="/register">
-          <el-button style="margin-left:10px">注册</el-button>
-        </router-link>
-      </div>
-    </el-card>
-  </div>
+  <el-row class="mb-4">
+    <el-button>Default</el-button>
+    <el-button type="primary" aria-disabled="true">Primary</el-button>
+    <el-button type="success" disabled="true">Success</el-button>
+    <el-button type="info">Info</el-button>
+    <el-button type="warning">Warning</el-button>
+    <el-button type="danger">Danger</el-button>
+  </el-row>
+
+  <el-row class="mb-4">
+    <el-button plain>Plain</el-button>
+    <el-button type="primary" plain>Primary</el-button>
+    <el-button type="success" plain>Success</el-button>
+    <el-button type="info" plain>Info</el-button>
+    <el-button type="warning" plain>Warning</el-button>
+    <el-button type="danger" plain>Danger</el-button>
+  </el-row>
+
+  <el-row class="mb-4">
+    <el-button round>Round</el-button>
+    <el-button type="primary" round>Primary</el-button>
+    <el-button type="success" round>Success</el-button>
+    <el-button type="info" round>Info</el-button>
+    <el-button type="warning" round>Warning</el-button>
+    <el-button type="danger" round>Danger</el-button>
+  </el-row>
+
+  <el-row>
+    <el-button :icon="Search" circle />
+    <el-button type="primary" :icon="Edit" circle />
+    <el-button type="success" :icon="Check" circle />
+    <el-button type="info" :icon="Message" circle />
+    <el-button type="warning" :icon="Star" circle />
+    <el-button type="danger" :icon="Delete" circle />
+  </el-row>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      ruleForm: {
-        uname: "",
-        password: "",
-      },
-      rules: {
-        uname: [
-          { required: true, message: "用户名不能为空！", trigger: "blur" },
-        ],
-        password: [
-          { required: true, message: "密码不能为空！", trigger: "blur" },
-        ],
-      },
-    };
-  },
-  methods: {
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
-    },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-    },
-  },
-};
+<script  setup>
+import {
+  Check,
+  Delete,
+  Edit,
+  Message,
+  Search,
+  Star,
+} from '@element-plus/icons-vue'
 </script>
-
-<style scoped>
-.box-card {
-  margin: auto auto;
-  width: 400px;
-}
-.login-from {
-  margin: auto auto;
-}
-</style>

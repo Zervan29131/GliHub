@@ -17,40 +17,39 @@ import {
         <!-- 左侧菜单 -->
         <el-aside width="200px">
             <div class="el-aside__logo"></div>
-            <el-menu active-text-color="#ffd04b" background-color="#232323"  text-color="#fff"
-                router>
-                <el-menu-item >
+            <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router>
+                <el-menu-item>
                     <el-icon>
                         <Management />
                     </el-icon>
-                    <span>文章分类</span>
+                    <span>安全评价</span>
                 </el-menu-item>
-                <el-menu-item >
+                <el-menu-item>
                     <el-icon>
                         <Promotion />
                     </el-icon>
-                    <span>文章管理</span>
+                    <span>安全监控</span>
                 </el-menu-item>
-                <el-sub-menu >
+                <el-sub-menu>
                     <template #title>
                         <el-icon>
                             <UserFilled />
                         </el-icon>
-                        <span>个人中心</span>
+                        <span>个人信息管理</span>
                     </template>
-                    <el-menu-item >
+                    <el-menu-item>
                         <el-icon>
                             <User />
                         </el-icon>
                         <span>基本资料</span>
                     </el-menu-item>
-                    <el-menu-item >
+                    <el-menu-item>
                         <el-icon>
                             <Crop />
                         </el-icon>
                         <span>更换头像</span>
                     </el-menu-item>
-                    <el-menu-item >
+                    <el-menu-item>
                         <el-icon>
                             <EditPen />
                         </el-icon>
@@ -63,7 +62,7 @@ import {
         <el-container>
             <!-- 头部区域 -->
             <el-header>
-                <div>黑马程序员：<strong>东哥</strong></div>
+                <div>企业安全信息管理系统：<strong>东哥</strong></div>
                 <el-dropdown placement="bottom-end">
                     <span class="el-dropdown__box">
                         <el-avatar :src="avatar" />
@@ -88,7 +87,7 @@ import {
                 </div>
             </el-main>
             <!-- 底部区域 -->
-            <el-footer>大事件 ©2023 Created by 黑马程序员</el-footer>
+            <el-footer>glihub ©2023 Created by zervan</el-footer>
         </el-container>
     </el-container>
 </template>
