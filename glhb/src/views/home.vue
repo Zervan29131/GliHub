@@ -18,26 +18,16 @@ import {
         <el-aside width="200px">
             <div class="el-aside__logo"></div>
             <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router>
-                <el-menu-item>
-                    <el-icon>
-                        <Management />
-                    </el-icon>
-                    <span>安全评价</span>
-                </el-menu-item>
-                <el-menu-item>
-                    <el-icon>
-                        <Promotion />
-                    </el-icon>
-                    <span>安全监控</span>
-                </el-menu-item>
-                <el-sub-menu>
+
+                <!-- 用户管理模块 -->
+                <el-sub-menu >
                     <template #title>
                         <el-icon>
                             <UserFilled />
                         </el-icon>
-                        <span>个人信息管理</span>
+                        <span>用户管理</span>
                     </template>
-                    <el-menu-item>
+                    <el-menu-item index="/user/info">
                         <el-icon>
                             <User />
                         </el-icon>
@@ -56,13 +46,29 @@ import {
                         <span>重置密码</span>
                     </el-menu-item>
                 </el-sub-menu>
+                <!-- 安全评价模块 -->
+                <el-menu-item index="/article/category">
+                    <el-icon>
+                        <!-- 子路由 -->
+                        <Management />
+                    </el-icon>
+                    <span>安全评价</span>
+                </el-menu-item>
+                <!-- 安全监控模块 -->
+                <el-menu-item index="/article/manage">
+                    <el-icon>
+                        <!-- 子路由 -->
+                        <Promotion />
+                    </el-icon>
+                    <span>安全监控</span>
+                </el-menu-item>
             </el-menu>
         </el-aside>
         <!-- 右侧主区域 -->
         <el-container>
             <!-- 头部区域 -->
             <el-header>
-                <div>企业安全信息管理系统：<strong>东哥</strong></div>
+                <div>企业安全信息管理系统：<strong>zervan</strong></div>
                 <el-dropdown placement="bottom-end">
                     <span class="el-dropdown__box">
                         <el-avatar :src="avatar" />
@@ -82,9 +88,11 @@ import {
             </el-header>
             <!-- 中间区域 -->
             <el-main>
-                <div style="width: 1290px; height: 570px;border: 1px solid red;">
+                <!-- <div style="width: 1290px; height: 570px;border: 1px solid red;">
                     内容展示区
-                </div>
+                </div> -->
+                <RouterView />
+
             </el-main>
             <!-- 底部区域 -->
             <el-footer>glihub ©2023 Created by zervan</el-footer>
@@ -101,7 +109,7 @@ import {
 
         &__logo {
             height: 120px;
-            background: url('@/assets/logo.png') no-repeat center / 120px auto;
+            background: url('@/assets/logo-bg.jpg') no-repeat center / 120px auto;
         }
 
         .el-menu {

@@ -64,14 +64,25 @@ const register = async () => {
   //   alert('注册失败!')
   // }
 }
+//导入router包
+import { useRouter } from 'vue-router'
+const router = useRouter();
+//导入token状态
+import { useTokenStore } from '@/stores/token.js'
+//调用useTokenStore得到状态
+const tokenStore = useTokenStore();
+//表单校验函数
 const login = async () => {
-  //console.log('注册...');
   //register是一个响应式的对象，需要加.value才可以获取值
   let result = await userLoginService(registerData.value);
   if (result.code == 1) {
     // alert(result.msg?result.msg :'登录成功!')
     //优化alert
     ElMessage.success(result.msg?result.msg : '登录成功')
+    //把得到的token储存在pinia
+    tokenStore.setToken(result.data)
+    //跳转到首页，路由进行跳转
+    router.push('/')
   } 
   // else {
   //   alert('登录失败!')
@@ -102,7 +113,7 @@ const login = async () => {
         <!-- 注册按钮 -->
         <el-form-item>
           <el-button class="button" type="primary" auto-insert-space @click="register">
-            注册
+            确认注册
           </el-button>
         </el-form-item>
         <el-form-item class="flex">
@@ -114,7 +125,7 @@ const login = async () => {
       <!-- 登录表单 -->
       <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData" :rules="registerDataRules">
         <el-form-item>
-          <h1>登录</h1>
+          <h1>用户登录</h1>
         </el-form-item>
         <el-form-item prop="username">
           <el-input :prefix-icon="User" placeholder="请输入用户名(例如:admin)" v-model="registerData.username"></el-input>
@@ -134,7 +145,7 @@ const login = async () => {
         </el-form-item>
         <!-- 登录按钮 -->
         <el-form-item>
-          <el-button class="button" type="primary" auto-insert-space @click="login">登录</el-button>
+          <el-button class="button" type="primary" auto-insert-space @click="login">确认登录</el-button>
         </el-form-item>
         <el-form-item class="flex"> </el-form-item>
       </el-form>
