@@ -31,19 +31,19 @@ import {
                         <el-icon>
                             <User />
                         </el-icon>
-                        <span>基本资料</span>
+                        <span>信息管理</span>
                     </el-menu-item>
                     <el-menu-item>
                         <el-icon>
                             <Crop />
                         </el-icon>
-                        <span>更换头像</span>
+                        <span>作业区管理</span>
                     </el-menu-item>
                     <el-menu-item>
                         <el-icon>
                             <EditPen />
                         </el-icon>
-                        <span>重置密码</span>
+                        <span>设备管理</span>
                     </el-menu-item>
                 </el-sub-menu>
                 <!-- 安全评价模块 -->
