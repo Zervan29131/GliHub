@@ -21,12 +21,12 @@
       </el-upload>
     </div>
 
+        <!--      <a href="https://element-plus.org/zh-CN/component/upload.html" target="_blank">Element Plus Upload</a>-->
 
-    <div>
+    <!-- <div>
       <div class="content-title">URL地址上传</div>
 
       <div class="plugins-tips">
-        <!--      <a href="https://element-plus.org/zh-CN/component/upload.html" target="_blank">Element Plus Upload</a>-->
         <p style="line-height: 30px">
           参照的格式如下:
         </p>
@@ -56,7 +56,7 @@
         </el-icon>
         <span>列出全部</span>
       </el-button>
-    </div>
+    </div> -->
 
     <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
       <el-table-column prop="fid" label="文件ID" width="55" align="center"></el-table-column>
@@ -97,7 +97,77 @@
         @current-change="handlePageChange" @size-change="handleSizeChange"></el-pagination>
     </div>
 
+
+    <div class="content-title">图片检测</div>
+
+    <div class="plugins-tips">
+      <!--      <a href="https://element-plus.org/zh-CN/component/upload.html" target="_blank">Element Plus Upload</a>-->
+      <p style="line-height: 20px">
+        点击检测即可得到该图片在当前模型的检测结果，但需要等待几秒钟
+      </p>
+    </div>
+
+    <div class="handle-box">
+      <el-input v-model="query.keyword" placeholder="文件名称" class="handle-input mr10"></el-input>
+      <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
+
+      <!--        <el-button type="primary"  @click="getData">-->
+      <!--          <el-icon><Refresh /></el-icon>-->
+      <!--          <span>刷新页面</span>-->
+      <!--        </el-button>-->
+
+      <el-button type="success" @click="handleAll">
+        <el-icon>
+          <List />
+        </el-icon>
+        <span>列出全部</span>
+      </el-button>
+    </div>
+
+    <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
+      <el-table-column prop="fid" label="文件ID" width="55" align="center"></el-table-column>
+      <el-table-column prop="name" label="文件名"></el-table-column>
+
+      <el-table-column label="图片(查看大图)" align="center">
+
+        <template #default="scope">
+          <el-image class="table-td-thumb" :src="scope.row.img_url" :z-index="10"
+            :preview-src-list="[scope.row.img_url]" preview-teleported>
+          </el-image>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="时间">
+
+        <template #default="scope">{{ scope.row.timestamp }}</template>
+      </el-table-column>
+
+      <el-table-column prop="type" label="文件类别"></el-table-column>
+      <el-table-column prop="origin" label="文件来源"></el-table-column>
+      <el-table-column prop="width" label="宽度"></el-table-column>
+      <el-table-column prop="height" label="高度"></el-table-column>
+
+      <!--      <el-table-column prop="date" label="注册时间"></el-table-column>-->
+      <el-table-column label="操作" width="220" align="center">
+
+        <template #default="scope">
+          <el-button text :icon="Search" class="green" @click="detection(scope.$index, scope.row)" v-permiss="16">
+            检测
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <div class="pagination">
+      <el-pagination background layout="total, sizes, prev, pager, next, jumper" v-model:current-page="query.curPage"
+        v-model:page-size="query.pageSize" :page-sizes="[5, 10]" :total="pageTotal" @current-change="handlePageChange"
+        @size-change="handleSizeChange"></el-pagination>
+    </div>
+
+
   </div>
+
+
 </template>
 
 <script lang="ts" setup>
@@ -320,6 +390,47 @@ const uploadURL = (url: any) => {
     }
   })
 }
+
+/**
+ * 实现图片检测相关操作
+ */
+ const detection = (index: number, row: any) => {
+  console.log(row)
+  axios({ // 首先执行检测任务，生成结果图片
+    method: 'POST',
+    url: '/detect',
+    data: row
+  }).then(res1 => {
+    // console.log(res1)
+    if (res1.data.status == 'success') { // 然后再把result得到的json传入到数据库中
+      axios({
+        method: 'POST',
+        url: '/result',
+        data: res1.data.results.log
+      }).then(res2 => {
+        // console.log(res2)
+        if (res2.data.status == 'success') { // 最后再把obj信息传入到obj中
+          axios({
+            method: 'POST',
+            url: '/obj',
+            data: res1.data // 在/detect后端哪里得到的json信息
+          }).then(res3 => {
+            // console.log(res3)
+            if (res3.data.status == 'success') {
+              ElMessage.success('目标图片检测成功，保存的文件名称是:\n'
+                + res1.data.results.log.filename + '_' +
+                res1.data.results.log.timestamp + '.' + res1.data.results.log.type);
+            }
+          })
+        }
+      })
+    }
+    else {
+      ElMessage.error('检测中途出现异常')
+    }
+  })
+}
+
 </script>
 
 <style scoped>

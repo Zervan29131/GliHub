@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar">
         <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="sidebar.collapse"
-            background-color="#324157" text-color="#bfcbd9" active-text-color="#20a0ff" unique-opened router>
+            background-color="#232323" text-color="#bfcbd9" active-text-color="#ffd04b" unique-opened router>
             <template v-for="item in items">
                 <template v-if="item.subs">
                     <el-sub-menu :index="item.index" :key="item.index" v-permiss="item.permiss">
@@ -54,20 +54,21 @@ const items = [
         permiss: '2',
         subs: [
             {
-                index: '/table',
+                index: '/userInfo',
                 title: '信息管理',
                 permiss: '2',
-            },
-            {
-                index: '/import',
-                title: '作业区管理',
-                permiss: '2',
-            },
-            {
-                index: '/export',
+            },      
+                  {
+                index: '/equipInfo',
                 title: '设备管理',
                 permiss: '2',
             },
+            {
+                index: '/areaInfo',
+                title: '作业区管理',
+                permiss: '2',
+            },
+
         ],
     }, {
         index: '4',
@@ -106,12 +107,12 @@ const items = [
                 title: '目标检测',
                 permiss: '9'
             },
-            {
-                icon: 'Notebook',
-                index: '/resultManager',
-                title: '记录管理',
-                permiss: '10'
-            },
+            // {
+            //     icon: 'Notebook',
+            //     index: '/resultManager',
+            //     title: '记录管理',
+            //     permiss: '10'
+            // },
         ],
     },
 

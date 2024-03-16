@@ -22,14 +22,41 @@ const routes: RouteRecordRaw[] = [
             //     component: () => import(/* webpackChunkName: "dashboard" */ '../views/dashboard.vue'),
             // },
             {
-                path: '/table',
-                name: 'basetable',
+                path: '/userInfo',
+                name: 'usertable',
                 meta: {
-                    title: '表格',
+                    title: '人员管理',
+                    permiss: '1',
+                },
+                component: () => import(/* webpackChunkName: "table" */ '../viewInfo/userInfo.vue'),
+            },       
+                 {
+                path: '/equipInfo',
+                name: 'equiptable',
+                meta: {
+                    title: '设备管理',
                     permiss: '2',
                 },
-                component: () => import(/* webpackChunkName: "table" */ '../views/table.vue'),
+                component: () => import(/* webpackChunkName: "table" */ '../viewInfo/equipInfo.vue'),
             },
+             {
+                path: '/areaInfo',
+                name: 'areatable',
+                meta: {
+                    title: '作业区管理',
+                    permiss: '3',
+                },
+                component: () => import(/* webpackChunkName: "table" */ '../viewInfo/areaInfo.vue'),
+            },             {
+                path: '/editor',
+                name: 'editor',
+                meta: {
+                    title: '危险源辨识',
+                    permiss: '8',
+                },
+                component: () => import(/* webpackChunkName: "editor" */ '../views/editor.vue'),
+            },
+
             {
                 path: '/charts',
                 name: 'basecharts',
@@ -101,15 +128,7 @@ const routes: RouteRecordRaw[] = [
                 },
                 component: () => import(/* webpackChunkName: "user" */ '../views/user.vue'),
             },
-            {
-                path: '/editor',
-                name: 'editor',
-                meta: {
-                    title: '富文本编辑器',
-                    permiss: '8',
-                },
-                component: () => import(/* webpackChunkName: "editor" */ '../views/editor.vue'),
-            },
+
             {
                 path: '/markdown',
                 name: 'markdown',

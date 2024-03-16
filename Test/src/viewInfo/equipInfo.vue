@@ -15,11 +15,15 @@
 			<!-- <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header"> -->
 			<el-table :data="categorys" class="table" style="width: 100%" ref="multipleTable"
 				header-cell-class-name="table-header">
-				<el-table-column label="账号" width="100" type="index" prop="id" > </el-table-column>
-				<el-table-column label="姓名" prop="Name"> </el-table-column>
-				<el-table-column label="电话" prop="Telephone"></el-table-column>
-				<el-table-column label="部门" prop="Department"></el-table-column>
-				<el-table-column label="权限范围" prop="authority"></el-table-column>
+				<el-table-column label="ID" width="100" type="index" prop="id" > </el-table-column>
+				<el-table-column label="设备名称" prop="Name"> </el-table-column>
+				<el-table-column label="产品型号" prop="Type"> </el-table-column>
+				<el-table-column label="数量" prop="Number"> </el-table-column>
+				<el-table-column label="检测维护记录" prop="Use"> </el-table-column>
+				<el-table-column label="运行使用情况" prop="Time"></el-table-column>
+				<el-table-column label="存放地点" prop="Area"></el-table-column>
+				<el-table-column label="保管人员" prop="Person"></el-table-column>
+				<el-table-column label="联系方式" prop="Telephone"></el-table-column>
 				<!-- <el-table-column label="操作" width="100">
 					<template #default="{ row }">
 						<el-button :icon="Edit" circle plain type="primary"></el-button>
@@ -53,7 +57,6 @@
 					</template>
 				</el-table-column> -->
 
-				<el-table-column prop="createTime" label="注册时间"></el-table-column>
 				<el-table-column label="操作" width="220" align="center">
 					<template #default="scope">
 						<el-button text :icon="Edit" @click="handleEdit(scope.$index, scope.row)" v-permiss="15">
@@ -116,33 +119,39 @@ interface TableItem {
 }
 // 人员信息数据
 const categorys = ref([
-	{
-		"id": 31,
-		"Name": "张三",
+{
+		"id": 4,
+		"Name": "消防水带",
+		"Type": "10-65-25",
+		"Number": "2",
+		"Use": "有",
+		"Time": "良好",
+		"Area": "一矿区",
+		"Person": "张三",
 		"Telephone": "13512345678",
-		"Department": "一部门",
-		"authority": "管理员",
-		"createTime": "2023-09-02 12:06:59",
-		"updateTime": "2023-09-02 12:06:59"
 	},
 	{
 		"id": 4,
-		"Name": "里斯",
+		"Name": "消防水带",
+		"Type": "10-65-25",
+		"Number": "2",
+		"Use": "有",
+		"Time": "良好",
+		"Area": "一矿区",
+		"Person": "张三",
 		"Telephone": "13512345678",
-		"Department": "一部门",
-		"authority": "普通用户",
-		"createTime": "2023-09-02 12:08:16",
-		"updateTime": "2023-09-02 12:08:16"
 	},
 	{
-		"id": 5,
-		"Name": "王五",
+		"id": 4,
+		"Name": "消防水带",
+		"Type": "10-65-25",
+		"Number": "2",
+		"Use": "有",
+		"Time": "良好",
+		"Area": "一矿区",
+		"Person": "张三",
 		"Telephone": "13512345678",
-		"Department": "二部门",
-		"authority": "普通用户",
-		"createTime": "2023-09-02 12:08:33",
-		"updateTime": "2023-09-02 12:08:33"
-	}
+	},
 ])
 
 const query = reactive({
