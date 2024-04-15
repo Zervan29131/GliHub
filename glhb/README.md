@@ -1,481 +1,137 @@
-#  一、环境准备
+# vue-manage-system
 
-### 1.1 创建工程
+<a href="https://github.com/vuejs/vue">
+    <img src="https://img.shields.io/badge/vue-3.1.2-brightgreen.svg" alt="vue">
+  </a>
+  <a href="https://github.com/vuejs/pinia">
+    <img src="https://img.shields.io/badge/pinia-2.0.14-brightgreen.svg" alt="pinia">
+  </a>
+  <a href="https://github.com/lin-xin/vue-manage-system/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/mashape/apistatus.svg" alt="license">
+  </a>
+  <a href="https://github.com/lin-xin/vue-manage-system/releases">
+    <img src="https://img.shields.io/github/release/lin-xin/vue-manage-system.svg" alt="GitHub release">
+  </a>
+  <a href="https://lin-xin.gitee.io/example/work/#/donate">
+    <img src="https://img.shields.io/badge/%24-donate-ff69b4.svg" alt="donate">
+  </a>
 
-```js
-npm init vue@latest
-npm install
+基于 Vue3 + pinia + Element Plus 的后台管理系统解决方案。[线上地址](https://lin-xin.gitee.io/example/work/)
+
+> Vue2 版本请看 [tag-V4.2.0](https://github.com/lin-xin/vue-manage-system/tree/V4.2.0)
+
+[English document](https://github.com/lin-xin/manage-system/blob/master/README_EN.md)
+
+## 赞助商
+
+### 好问
+
+[<img src="https://static.bestqa.net/logo/bestqa_haowen.png" width="220" height="100">](https://www.bestqa.net/home/index.html)
+
+专业问卷服务，一对一客服，按需定制 
+
+## 支持作者
+
+请作者喝杯咖啡吧！(微信号：linxin_20)
+
+![微信扫一扫](https://lin-xin.gitee.io/images/weixin.jpg)
+
+## 前言
+
+该方案作为一套多功能的后台框架模板，适用于绝大部分的后台管理系统开发。基于 Vue3 + pinia + typescript，引用 Element Plus 组件库，方便开发。实现逻辑简单，适合外包项目，快速交付。
+
+## 功能
+
+-   [x] Element Plus
+-   [x] vite 3
+-   [x] pinia
+-   [x] typescript
+-   [x] 登录/注销
+-   [x] Dashboard
+-   [x] 表格
+-   [x] Tab 选项卡
+-   [x] 表单
+-   [x] 图表 :bar_chart:
+-   [x] 富文本/markdown编辑器
+-   [x] 图片拖拽/裁剪上传
+-   [x] 权限管理
+-   [x] 三级菜单
+-   [x] 自定义图标
+
+
+## 安装步骤
+> 因为使用vite3，node版本需要 14.18+
+
+```
+git clone https://github.com/lin-xin/vue-manage-system.git      // 把模板下载到本地
+cd vue-manage-system    // 进入模板目录
+npm install         // 安装项目依赖，等待安装完成之后，安装失败可用 cnpm 或 yarn
+
+// 运行
+npm run dev
+
+// 执行构建命令，生成的dist文件夹放在服务器下即可访问
+npm run build
 ```
 
-### 1.2 安装插件
+## 组件使用说明与演示
 
-1. 安装element-plus
+### vue-schart
 
-   ```js
-   1.1 执行命令: npm install element-plus --save
-   1.2 在main.js中做如下配置
-   	import ElementPlus from 'element-plus'
-   	import 'element-plus/dist/index.css'
-   	app.use(ElementPlus)
-   ```
+vue.js 封装 sChart.js 的图表组件。访问地址：[vue-schart](https://github.com/lin-xin/vue-schart#/) 
 
-2. 安装axios
-
-   ```js
-   npm install axios
-   ```
-
-3. 安装sass依赖
-
-   ```js
-   npm install sass -D
-   ```
-
-# 二、页面搭建
-
-### 2.1 最终页面
+<p><a href="https://www.npmjs.com/package/vue-schart"><img src="https://img.shields.io/npm/dm/vue-schart.svg" alt="Downloads"></a></p>
 
 ```html
-<script setup>
-import { User, Lock } from "@element-plus/icons-vue";
-import { ref } from "vue";
-//控制注册与登录表单的显示， 默认显示注册
-const isRegister = ref(false);
-
-//用于注册的数据模型(接口文档)
-const registerData = ref({
-  username: "",
-  password: "",
-  rePassword: "",
-});
-//清空数据模型的数据
-const clearRegisterData = () => {
-  registerData.value = {
-    username: '',
-    password: '',
-    rePassword: ''
-  }
-}
-
-//自定义确认密码的校验函数
-const rePasswordValid = (rule, value, callback) => {
-  if (value == null || value === "") {
-    return callback(new Error("请再次确认密码"));
-  } else if (registerData.value.password !== value) {
-    //registerData是响应式对象，需要加上.value才能校验通过
-    return callback(new Error("两次输入密码不一致"));
-  } else {
-    return callback;//校验通过
-  }
-};
-//用于注册的表单校验规则模型
-const registerDataRules = ref({
-  username: [
-    { required: true, message: "请输入用户名", trigger: "blur" },
-    { min: 5, max: 16, message: "用户名的长度必须为5~16位", trigger: "blur" },
-  ],
-  password: [
-    { required: true, message: "请输入密码", trigger: "blur" },
-    { min: 5, max: 16, message: "密码长度必须为5~16位", trigger: "blur" },
-  ],
-  rePassword: [
-    { validator: rePasswordValid, trigger: "blur" },
-    //rePasswordValid需要重新自定义确认密码的校验函数
-  ],
-});
-
-//调用后台接口，完成注册接口调用
-import { userRegisterService,userLoginService } from '@/api/user'
-//用于注册的事件函数
-const register = async () => {
-  //console.log('注册...');
-  //register是一个响应式的对象，需要加.value才可以获取值
-  let result = await userRegisterService(registerData.value);
-  if (result.code == 1) {
-    alert(result.msg?result.msg :'注册成功!')
-  } else {
-    alert('注册失败!')
-  }
-}
-const login = async () => {
-  //console.log('注册...');
-  //register是一个响应式的对象，需要加.value才可以获取值
-  let result = await userLoginService(registerData.value);
-  if (result.code == 1) {
-    alert(result.msg?result.msg :'登录成功!')
-  } else {
-    alert('登录失败!')
-  }
-}
-</script>
-
 <template>
-  <el-row class="login-page">
-    <el-col :span="12" class="bg"></el-col>
-    <el-col :span="6" :offset="3" class="form">
-      <!-- 注册表单 -->
-      <el-form ref="form" size="large" autocomplete="off" v-if="isRegister" :model="registerData"
-        :rules="registerDataRules">
-        <el-form-item>
-          <h1>注册</h1>
-        </el-form-item>
-        <el-form-item prop="username">
-          <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码" v-model="registerData.password"></el-input>
-        </el-form-item>
-        <el-form-item prop="rePassword">
-          <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码"
-            v-model="registerData.rePassword"></el-input>
-        </el-form-item>
-        <!-- 注册按钮 -->
-        <el-form-item>
-          <el-button class="button" type="primary" auto-insert-space @click="register">
-            注册
-          </el-button>
-        </el-form-item>
-        <el-form-item class="flex">
-          <el-link type="info" :underline="false" @click="isRegister = false;clearRegisterData()">
-            ← 返回
-          </el-link>
-        </el-form-item>
-      </el-form>
-      <!-- 登录表单 -->
-      <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData" :rules="registerDataRules">
-        <el-form-item>
-          <h1>登录</h1>
-        </el-form-item>
-        <el-form-item prop="username">
-          <el-input :prefix-icon="User" placeholder="请输入用户名(例如:admin)" v-model="registerData.username"></el-input>
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input name="password" :prefix-icon="Lock" type="password" placeholder="请输入密码(例如:123456)"
-            v-model="registerData.password"></el-input>
-        </el-form-item>
-        <el-form-item class="flex">
-          <div class="flex">
-            <!-- <el-checkbox>记住我</el-checkbox> -->
-            <!-- <el-link type="primary" :underline="false">
-                        注册 →
-                    </el-link> -->
-            <el-link type="primary" :underline="false" @click="isRegister = true;clearRegisterData()">注册</el-link>
-          </div>
-        </el-form-item>
-        <!-- 登录按钮 -->
-        <el-form-item>
-          <el-button class="button" type="primary" auto-insert-space @click="login">登录</el-button>
-        </el-form-item>
-        <el-form-item class="flex"> </el-form-item>
-      </el-form>
-    </el-col>
-  </el-row>
+    <div>
+        <schart class="wrapper" canvasId="myCanvas" :options="options"></schart>
+    </div>
 </template>
 
-<style lang="scss" scoped>
-/* 样式 */
-.login-page {
-  height: 100vh;
-  background-color: #fff;
-
-  .bg {
-    background: url("../assets/logo-bg.jpg") no-repeat 60% center / 240px auto,
-      url("@/assets/login-bg.jpg") no-repeat center / cover;
-    border-radius: 0 20px 20px 0;
-  }
-
-  .form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    user-select: none;
-
-    .title {
-      margin: 0 auto;
+<script setup lang="ts">
+import { ref } from 'vue';
+import Schart from "vue-schart"; // 导入Schart组件
+const options = ref({
+    type: "bar",
+    title: {
+        text: "最近一周各品类销售图",
+    },
+    labels: ["周一", "周二", "周三", "周四", "周五"],
+    datasets: [
+        {
+            label: "家电",
+            data: [234, 278, 270, 190, 230],
+        },
+        {
+            label: "百货",
+            data: [164, 178, 190, 135, 160],
+        },
+        {
+            label: "食品",
+            data: [144, 198, 150, 235, 120],
+        },
+    ],
+})
+</script>
+<style>
+    .wrapper {
+        width: 7rem;
+        height: 5rem;
     }
-
-    .button {
-      width: 100%;
-    }
-
-    .flex {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-    }
-  }
-}
 </style>
 ```
 
-### 2.2 绑定数据与事件
+## 项目截图
 
-#### 2.2.1 数据绑定
+### 登录
 
-每次点击注册或者登录，共用数据模型中的数据
+![Image text](https://github.com/lin-xin/manage-system/raw/master/screenshots/wms3.png)
 
-```js
-//用于注册的数据模型
-const registerData = ref({
-    username: '',
-    password: '',
-    rePassword: ''
-})
-//清空数据模型的数据
-const clearRegisterData = () => {
-    registerData.value = {
-        username: '',
-        password: '',
-        rePassword: ''
-    }
-}
-```
+### 首页
 
-#### 2.2.2 表单校验
+![Image text](https://github.com/lin-xin/manage-system/raw/master/screenshots/wms1.png)
 
-el-form标签上通过rules属性，绑定校验规则
+## License
 
-el-form-item标签上通过prop属性，指定校验项
-
-```js
-//自定义确认密码的校验函数
-const rePasswordValid = (rule, value, callback) => {
-  if (value == null || value === "") {
-    return callback(new Error("请再次确认密码"));
-  }else if (registerData.value.password !== value) {
-//registerData是响应式对象，需要加上.value才能校验通过
-    return callback(new Error("两次输入密码不一致"));
-  }else {
-    return callback;
-  }};
-//用于注册的表单校验模型
-const registerDataRules = ref({
-    username: [
-        { required: true, message: '请输入用户名', trigger: 'blur' },
-        { min: 5, max: 16, message: '用户名的长度必须为5~16位', trigger: 'blur' }
-    ],
-    password: [
-        { required: true, message: '请输入密码', trigger: 'blur' },
-        { min: 5, max: 16, message: '密码长度必须为5~16位', trigger: 'blur' }
-    ],
-    rePassword: [
-        { validator: rePasswordValid, trigger: 'blur' }
-    ]
-})
-```
-
-#### 2.2.3 事件绑定
-
-```js
-const register = async () => {
-    //console.log('注册...');
-    //register是一个响应式的对象，需要加.value才可以获取值
-    let result = await userRegisterService(registerData.value);
-    if (result.code == 0) {
-        alert('注册成功!')
-    } else {
-        alert('注册失败!')
-    }
-}
-const login = async () => {
-    //console.log('注册...');
-    //register是一个响应式的对象，需要加.value才可以获取值
-    let result = await userRegisterService(registerData.value);
-    if (result.code == 0) {
-        alert('登录成功!')
-    } else {
-        alert('登录失败!')
-    }
-}
-```
-
-
-
-### 2.3 调用后台接口
-
-#### 2.3.1 在src/api/user.js中提供访问注册和登录接口的函数
-
-```js
-//导入request.js请求工具
-import request from "@/utils/request"
-
-//提供注册接口的函数，接口调用的js文件中接口调用都说以service结尾的
-export const userRegisterService = (registerData) => {
-    //借助于URLSearchParams完成参数传递
-    var params = new URLSearchParams()
-    for (let key in registerData) {
-        params.append(key, registerData[key])
-    }
-    return request.post('/user/register', params)
-}
-//登录
-export const loginService = (loginData)=>{
-    var params = new URLSearchParams()
-    for(let key in loginData){
-        params.append(key,loginData[key])
-    }
-    return request.post('/user/login',params)
-}
-```
-
-#### 2.3.2 在Login.vue中完成接口调用
-
-```js
-import { registerService, loginService } from '@/api/user.js'
-
-//用于注册的事件函数
-const register = async () => {
-    //console.log('注册...');
-    //register是一个响应式的对象，需要加.value才可以获取值
-    let result = await userRegisterService(registerData.value);
-    if (result.code == 0) {
-        alert('注册成功!')
-    } else {
-        alert('注册失败!')
-    }
-}
-//用于登录的事件函数
-const login = async () => {
-    //console.log('注册...');
-    //register是一个响应式的对象，需要加.value才可以获取值
-    let result = await userRegisterService(registerData.value);
-    if (result.code == 0) {
-        alert('登录成功!')
-    } else {
-        alert('登录失败!')
-    }
-}
-```
-
-### 2.4 处理跨域问题
-
-由于发起ajax请求的域为http://localhost:5173, 而后台服务器的域为 http://localhost:8080, 所以浏览器会限制该请求的发送, 这种问题称为跨域问题, 跨域问题可以在服务器端解决,也可以在浏览器端解决, 咱们这一块通过配置代理的方式解决
-
-启动redies，执行以下命令
-
-```
-redis-service
-```
-
-启动jar包
-
-```
-java -jar (url)
-```
-
-**request.js中配置统一前缀 /api**
-
-```js
-//定制请求的实例
-
-//导入axios  npm install axios
-import axios from "axios";
-//定义一个变量,记录公共的前缀  ,  baseURL
-// const baseURL = 'http://localhost:8080';
-const baseURL = '/api';
-const instance = axios.create({ baseURL });
-
-//添加响应拦截器
-instance.interceptors.response.use(
-  (result) => {
-    // 判断业务状态码
-    if (result.data.code === 1) {
-      //成功，正常返回数据
-      return result.data;
-    }
-    // 操作失败
-    alert(result.data.msg ? result.data.msg : "服务异常");
-    // 异步操作的状态转换为失败
-    return Promise.reject(result.data);
-  },
-//   (err) => {
-    err => {
-    alert("服务异常");
-    return Promise.reject(err); //异步的状态转化成失败的状态
-  }
-);
-
-export default instance;
-```
-
-**vie.config.js中配置代理**
-
-```js
-import { fileURLToPath, URL } from 'node:url'
-
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    vue(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  },
-  //配置代理
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080', // 后端服务器地址
-        changeOrigin: true, // 是否改变请求域名
-        rewrite: (path) => path.replace(/^\/api/, '')//将原有请求路径中的api替换为''
-      }
-    }
-  }
-})
-```
-
-### 2.5 优化axios响应截器
-
-在接口调用的API中，我们都需要对业务响应的状态进行判断，从而给用户对应的提示，这个工作不难，但是每个接口的调用，都这样写代码，显然是比较繁琐的，我们可以在axios的相应拦截器中，如果服务器响应成功了，统一判断后台返回的业务状态码code，如果成功了，正常返回数据，如果失败了，则给出用户对应的提示即可
-
-**请求工具request.js**
-
-```js
-//定制请求的实例
-
-//导入axios  npm install axios
-import axios from "axios";
-//定义一个变量,记录公共的前缀  ,  baseURL
-// const baseURL = 'http://localhost:8080';
-const baseURL = '/api';
-const instance = axios.create({ baseURL });
-
-//添加响应拦截器
-instance.interceptors.response.use(
-  (result) => {
-    // 判断业务状态码
-    if (result.data.code === 1) {
-      //成功，正常返回数据
-      return result.data;
-    }
-    // 操作失败
-    // alert(result.data.msg ? result.data.msg : "服务异常");
-    //优化alert
-    ElMessage.error(result.data.msg?result.data.msg : '服务异常')
-    // 异步操作的状态转换为失败
-    return Promise.reject(result.data);
-  },
-//   (err) => {
-    err => {
-    alert("服务异常");
-    return Promise.reject(err); //异步的状态转化成失败的状态
-  }
-);
-export default instance;
-```
-
-**Element-Plus提示框的使用**
-
-```js
-import { ElMessage } from 'element-plus'
-    ElMessage.success(result.msg?result.msg : '登录成功')
-    ElMessage.success(result.msg?result.msg : '注册成功')
-    ElMessage.error(result.data.msg?result.data.msg : '服务异常')
-ElMessage.error('服务异常');
-ElMessage.success('登录成功!')
-```
+[MIT](https://github.com/lin-xin/vue-manage-system/blob/master/LICENSE)
