@@ -6,7 +6,7 @@ spring:
         druid:
             # 主库数据源
             master:
-                url: jdbc:mysql://localhost:3306/ruoyi
+                url: jdbc:mysql://localhost:3306/GliHub
                 username: root
                 password: Passw0rd
             # 从库数据源

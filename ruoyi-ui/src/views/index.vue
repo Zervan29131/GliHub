@@ -2,7 +2,7 @@
   <div class="app-container home">
     <el-row :gutter="20">
       <el-col :sm="24" :lg="24">
-        <blockquote class="text-warning" style="font-size: 14px">
+        <!-- <blockquote class="text-warning" style="font-size: 14px">
           领取阿里云通用云产品1888优惠券
           <br />
           <el-link
@@ -32,24 +32,23 @@
           <h4 class="text-danger">
             云产品通用红包，可叠加官网常规优惠使用。(仅限新用户)
           </h4>
-        </blockquote>
+        </blockquote> -->
 
         <hr />
       </el-col>
     </el-row>
     <el-row :gutter="20">
       <el-col :sm="24" :lg="12" style="padding-left: 20px">
-        <h2>若依后台管理框架</h2>
+        <h2>企业安全管理系统</h2>
         <p>
-          一直想做一款后台管理系统，看了很多优秀的开源项目但是发现没有合适自己的。于是利用空闲休息时间开始自己写一套后台系统。如此有了若依管理系统，她可以用于所有的Web应用程序，如网站管理后台，网站会员中心，CMS，CRM，OA等等，当然，您也可以对她进行深度定制，以做出更强系统。所有前端后台代码封装过后十分精简易上手，出错概率低。同时支持移动客户端访问。系统会陆续更新一些实用功能。
         </p>
-        <p>
+        <!-- <p>
           <b>当前版本:</b> <span>v{{ version }}</span>
         </p>
         <p>
           <el-tag type="danger">&yen;免费开源</el-tag>
-        </p>
-        <p>
+        </p> -->
+        <!-- <p>
           <el-button
             type="primary"
             size="mini"
@@ -65,7 +64,7 @@
             @click="goTarget('http://ruoyi.vip')"
             >访问主页</el-button
           >
-        </p>
+        </p> -->
       </el-col>
 
       <el-col :sm="24" :lg="12" style="padding-left: 50px">
@@ -104,7 +103,7 @@
     </el-row>
     <el-divider />
     <el-row :gutter="20">
-      <el-col :xs="24" :sm="24" :md="12" :lg="8">
+      <!-- <el-col :xs="24" :sm="24" :md="12" :lg="8">
         <el-card class="update-log">
           <div slot="header" class="clearfix">
             <span>联系信息</span>
@@ -140,8 +139,8 @@
             </p>
           </div>
         </el-card>
-      </el-col>
-      <el-col :xs="24" :sm="24" :md="12" :lg="8">
+      </el-col> -->
+      <!-- <el-col :xs="24" :sm="24" :md="12" :lg="8">
         <el-card class="update-log">
           <div slot="header" class="clearfix">
             <span>更新日志</span>
@@ -332,7 +331,7 @@
                 <li>优化R响应成功状态码与全局保持一致</li>
                 <li>优化druid开启wall过滤器出现的异常问题</li>
                 <li>优化用户管理左侧树型组件增加选中高亮保持</li>
-                <li>优化新增用户与角色信息&用户与岗位信息逻辑</li>
+                <li>优化新增用户与角色信息&用户与设备信息逻辑</li>
                 <li>优化默认不启用压缩文件缓存防止node_modules过大</li>
                 <li>修复字典数据显示不全问题</li>
                 <li>修复操作日志查询类型条件为0时会查到所有数据</li>
@@ -412,7 +411,7 @@
                 <li>升级log4j2到2.17.1，防止漏洞风险</li>
                 <li>优化下载解析blob异常提示</li>
                 <li>优化代码生成字典组重复问题</li>
-                <li>优化查询用户的角色组&岗位组代码</li>
+                <li>优化查询用户的角色组&设备组代码</li>
                 <li>优化定时任务cron表达式小时设置24</li>
                 <li>优化用户导入提示溢出则显示滚动条</li>
                 <li>优化防重复提交标识组合为(key+url+header)</li>
@@ -810,7 +809,7 @@
                 <li>
                   修复dict_sort不可update为0的问题&查询返回增加dict_sort升序排序
                 </li>
-                <li>修正岗位导出权限注解</li>
+                <li>修正设备导出权限注解</li>
                 <li>禁止加密密文返回前端</li>
                 <li>修复代码生成页面中的查询条件创建时间未生效的问题</li>
                 <li>修复首页搜索菜单外链无法点击跳转问题</li>
@@ -962,8 +961,8 @@
             </el-collapse-item>
           </el-collapse>
         </el-card>
-      </el-col>
-      <el-col :xs="24" :sm="24" :md="12" :lg="8">
+      </el-col> -->
+      <!-- <el-col :xs="24" :sm="24" :md="12" :lg="8">
         <el-card class="update-log">
           <div slot="header" class="clearfix">
             <span>捐赠支持</span>
@@ -979,7 +978,7 @@
             >
           </div>
         </el-card>
-      </el-col>
+      </el-col> -->
     </el-row>
   </div>
 </template>
