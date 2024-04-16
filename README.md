@@ -1,75 +1,96 @@
-### 论文提纲
-题目：基于深度学习的建筑企业安全管理信息系统的研究与实现
-一、绪论
-1.1 选题背景
-1.2 研究意义
-1.3 国内外研究进展
-1.3.1 国外安全管理信息系统研究现状
-1.3.2 国内安全管理信息系统研究现状
-1.4 研究内容
-1.5 技术路线
+<p align="center">
+	<img alt="logo" src="https://oscimg.oschina.net/oscnet/up-d3d0a9303e11d522a06cd263f3079027715.png">
+</p>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">RuoYi v3.8.7</h1>
+<h4 align="center">基于SpringBoot+Vue前后端分离的Java快速开发框架</h4>
+<p align="center">
+	<a href="https://gitee.com/y_project/RuoYi-Vue/stargazers"><img src="https://gitee.com/y_project/RuoYi-Vue/badge/star.svg?theme=dark"></a>
+	<a href="https://gitee.com/y_project/RuoYi-Vue"><img src="https://img.shields.io/badge/RuoYi-v3.8.7-brightgreen.svg"></a>
+	<a href="https://gitee.com/y_project/RuoYi-Vue/blob/master/LICENSE"><img src="https://img.shields.io/github/license/mashape/apistatus.svg"></a>
+</p>
 
-二、对工作流程中危险源辨识及风险评估
-2.1 对风险及隐患信息进行规范统计和处理
-针对整个企业生产建设过程对技术改造和企业管理等方面的危险、有害因素进行辨识。
-将安全条例、规章制度录入安全知识库中，为用户提供安全知识参考。事故案例中常见的事故类型，包括应急组织、应急处置和注意事项，为用户提供应急救援预案案例，在线管理应急预案。不断更新安全知识，将理论知识结合实际做好安全管理工作，实现安全技术与管理的标准化和科学化。 
+## 平台简介
 
-2.2 对生产作业环境进行风险评估
-系统会检索出所设置的区域，选择不同的作业区域，进行安全评价。
-选择要评价的方法，包括道氏指数法、作业条件危险性分析法、事故后果模拟法、安全检查表法，通过实现这些方法的计算程序，省去了繁琐的计算过程。
+若依是一套全部开源的快速开发平台，毫无保留给个人及企业免费使用。
 
-三、基于深度学习的作业区作业人员实时监控算法的实现
-对于意外闯入非安全区域的人员进行跟踪检测并向相关安全负责人预警
-可以通过实时画面对算法的检测情况进行直观了解，此时系统通过接口获取该设备在指定报警类型下的实时检测画面。
-目前各施工作业区施工过程中的异常情况监测往往依赖于监控人员通过现场监控视频记录，或采用安全监督人员人工巡逻的方式对异常情况进行监测，无法及时获取每一个作业人员的情况。针对该问题，预期设计开发一种基于深度学习的作业区作业人员异常情况实时监控与识别模块，以保障施工作业区的生产安全。
+* 前端采用Vue、Element UI。
+* 后端采用Spring Boot、Spring Security、Redis & Jwt。
+* 权限认证使用Jwt，支持多终端认证系统。
+* 支持加载动态权限菜单，多方式轻松权限控制。
+* 高效率开发，使用代码生成器可以一键生成前后端代码。
+* 提供了技术栈（[Vue3](https://v3.cn.vuejs.org) [Element Plus](https://element-plus.org/zh-CN) [Vite](https://cn.vitejs.dev)）版本[RuoYi-Vue3](https://github.com/yangzongzhuan/RuoYi-Vue3)，保持同步更新。
+* 提供了单应用版本[RuoYi-Vue-fast](https://github.com/yangzongzhuan/RuoYi-Vue-fast)，Oracle版本[RuoYi-Vue-Oracle](https://github.com/yangzongzhuan/RuoYi-Vue-Oracle)，保持同步更新。
+* 不分离版本，请移步[RuoYi](https://gitee.com/y_project/RuoYi)，微服务版本，请移步[RuoYi-Cloud](https://gitee.com/y_project/RuoYi-Cloud)
+* 阿里云折扣场：[点我进入](http://aly.ruoyi.vip)，腾讯云秒杀场：[点我进入](http://txy.ruoyi.vip)&nbsp;&nbsp;
+* 阿里云优惠券：[点我领取](https://www.aliyun.com/minisite/goods?userCode=brki8iof&share_source=copy_link)，腾讯云优惠券：[点我领取](https://cloud.tencent.com/redirect.php?redirect=1025&cps_key=198c8df2ed259157187173bc7f4f32fd&from=console)&nbsp;&nbsp;
 
-3.1 异常行为数据集的建立
-3.2 基于 AlphaPose 的作业人员异常行为检测方法
-3.3 基于 EfficientNet 的作业人员异常行为识别
+## 内置功能
 
-四、企业安全管理信息系统的设计
+1.  用户管理：用户是系统操作者，该功能主要完成系统用户配置。
+2.  部门管理：配置系统组织机构（公司、部门、小组），树结构展现支持数据权限。
+3.  岗位管理：配置系统用户所属担任职务。
+4.  菜单管理：配置系统菜单，操作权限，按钮权限标识等。
+5.  角色管理：角色菜单权限分配、设置角色按机构进行数据范围权限划分。
+6.  字典管理：对系统中经常使用的一些较为固定的数据进行维护。
+7.  参数管理：对系统动态配置常用参数。
+8.  通知公告：系统通知公告信息发布维护。
+9.  操作日志：系统正常操作日志记录和查询；系统异常信息日志记录和查询。
+10. 登录日志：系统登录日志记录查询包含登录异常。
+11. 在线用户：当前系统中活跃用户状态监控。
+12. 定时任务：在线（添加、修改、删除)任务调度包含执行结果日志。
+13. 代码生成：前后端代码的生成（java、html、xml、sql）支持CRUD下载 。
+14. 系统接口：根据业务代码自动生成相关的api接口文档。
+15. 服务监控：监视当前系统CPU、内存、磁盘、堆栈等相关信息。
+16. 缓存监控：对系统的缓存信息查询，命令统计等。
+17. 在线构建器：拖动表单元素生成相应的HTML代码。
+18. 连接池监视：监视当前系统数据库连接池状态，可进行分析SQL找出系统性能瓶颈。
 
-4.1 用户需求分析
+## 在线体验
 
-4.2平台整体设计结构与模块组成
-系统主要功能体现在信息管理、安全评价、安全控制三大功能模块，具体功能如下： 
+- admin/admin123  
+- 陆陆续续收到一些打赏，为了更好的体验已用于演示服务器升级。谢谢各位小伙伴。
 
-4.2.1 系统开发技术简介
-该系统后端控制部分主要采用SpringBoot+Spring MVC+Mybatis框架实现，数据库部分由MySQL提供支持。
-基于深度学习的作业区作业人员实时监控算法采用 python 语言进行编写，Flask 框架对于两种语言间的通信在其中发挥了重要作用。
+演示地址：http://vue.ruoyi.vip  
+文档地址：http://doc.ruoyi.vip
 
-​4.2.2 信息管理模块
-系统登陆界面：
-为了提高系统的安全性设置用户登录。企业人员需要在系统中完成个人账号注册，录入后台数据库，检索到相应登录信息，便可以进入系统。
-主要负责人可以查看用户的注册资料以及各个专业区科的相关信息。通过权限管理，可以进行角色设定、角色权限设置，可以添加信息、修改信息和查看所有信息，进行添加部门、查看所有部门和编辑部门。
-个人信息管理：
-实现包括姓名、性别、民族政治面貌以及出生日期、本人照片等信息管理，用户可以对个人信息进行填写修改，以及对密码进行重置，方便了系统管理员的统计与管理。
-​作业区和设备信息管理：
-实现作业区和设备信息的管理，主要包括对作业区安全程度的区分，设备信息查找和维修系统报备等操作。
+## 演示图
 
-4.2.3 安全评价模块
-对工作流程中危险源辨识及风险评估
+<table>
+    <tr>
+        <td><img src="https://oscimg.oschina.net/oscnet/cd1f90be5f2684f4560c9519c0f2a232ee8.jpg"/></td>
+        <td><img src="https://oscimg.oschina.net/oscnet/1cbcf0e6f257c7d3a063c0e3f2ff989e4b3.jpg"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://oscimg.oschina.net/oscnet/up-8074972883b5ba0622e13246738ebba237a.png"/></td>
+        <td><img src="https://oscimg.oschina.net/oscnet/up-9f88719cdfca9af2e58b352a20e23d43b12.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://oscimg.oschina.net/oscnet/up-39bf2584ec3a529b0d5a3b70d15c9b37646.png"/></td>
+        <td><img src="https://oscimg.oschina.net/oscnet/up-936ec82d1f4872e1bc980927654b6007307.png"/></td>
+    </tr>
+	<tr>
+        <td><img src="https://oscimg.oschina.net/oscnet/up-b2d62ceb95d2dd9b3fbe157bb70d26001e9.png"/></td>
+        <td><img src="https://oscimg.oschina.net/oscnet/up-d67451d308b7a79ad6819723396f7c3d77a.png"/></td>
+    </tr>	 
+    <tr>
+        <td><img src="https://oscimg.oschina.net/oscnet/5e8c387724954459291aafd5eb52b456f53.jpg"/></td>
+        <td><img src="https://oscimg.oschina.net/oscnet/644e78da53c2e92a95dfda4f76e6d117c4b.jpg"/></td>
+    </tr>
+	<tr>
+        <td><img src="https://oscimg.oschina.net/oscnet/up-8370a0d02977eebf6dbf854c8450293c937.png"/></td>
+        <td><img src="https://oscimg.oschina.net/oscnet/up-49003ed83f60f633e7153609a53a2b644f7.png"/></td>
+    </tr>
+	<tr>
+        <td><img src="https://oscimg.oschina.net/oscnet/up-d4fe726319ece268d4746602c39cffc0621.png"/></td>
+        <td><img src="https://oscimg.oschina.net/oscnet/up-c195234bbcd30be6927f037a6755e6ab69c.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://oscimg.oschina.net/oscnet/b6115bc8c31de52951982e509930b20684a.jpg"/></td>
+        <td><img src="https://oscimg.oschina.net/oscnet/up-5e4daac0bb59612c5038448acbcef235e3a.png"/></td>
+    </tr>
+</table>
 
-4.2.4 安全监控模块
-基于深度学习的作业区作业人员实时监控算法的实现
 
-4.3 非功能性需求分析 
-非功能性需求包括时间特性、适应性、安全性、可靠性、可扩充性、互操作性、健壮性、易使用性、可维护性、可移植性、可重用性。
-其中主要方面有：
-（1）正确性与完整性
-正确性是系统设计首要考虑的要素，系统在正常运行的状态下能否正确处理用户操作界面，满足用户性能需求。系统设计完整，各项功能能顺利执行，操作流畅，用户在使用系 统时能够准确处理各项操作。 
-（2）实用性与易操作性
-系统的研发设计需要以实际用户的需要为主体，结合公司实际需要，每一项功能模块的设计都需要站在使用者的角度，考虑到使用者的日常工作实际需要、操作习惯等，应该操作简单，能够很快被使用者掌握。工人文化程度普遍不高，因此便于用户操作是设计系统要求之一。界面设计简单不繁琐，有提示性的标识，提示用户下一步的动作，同时也要操作灵活。 
-（3）安全性与运行可靠性 
-系统开发的重要指标之一是长期稳定的运行，减少故障的出现，避免数据的丢失，出现故障时能给用户提示，或者自动处理因操作错误出现的故障。系统管理员分配给系统用户的账号和密码，登录后拥有不同的管理权限和不同的显示界面，避免了其他用户随意注册、泄露数据，具有较高的安全性。 
+## 若依前后端分离交流群
 
-4.4 系统应用及效果分析
-
-五、结论与展望
-总结全文研究内容以及当前改进存在的不足指出，并提出下一步工作的改进方向。
-
-
-
-我在了解了一些电子信息与互联网行业的基础知识和相关从业者信息之后，发现安全工程所教的东西宽泛而浅显，根本无法形成技术壁垒、行业护城河，这就导致了其他行业如果想进入这个行业的成本几乎为零，只能通过专业背景以及学历提升来挑选人材，也就是熬资质来晋升。而人们在面向就业的时候所展现出来的基础素质与综合素质是通过个人成长带来的，通常与专业所提供的平台无关，这使得大学四年在学校所消磨的时间大多被浪费掉了。
-
-
+QQ群： [![加入QQ群](https://img.shields.io/badge/已满-937441-blue.svg)](https://jq.qq.com/?_wv=1027&k=5bVB1og) [![加入QQ群](https://img.shields.io/badge/已满-887144332-blue.svg)](https://jq.qq.com/?_wv=1027&k=5eiA4DH) [![加入QQ群](https://img.shields.io/badge/已满-180251782-blue.svg)](https://jq.qq.com/?_wv=1027&k=5AxMKlC) [![加入QQ群](https://img.shields.io/badge/已满-104180207-blue.svg)](https://jq.qq.com/?_wv=1027&k=51G72yr) [![加入QQ群](https://img.shields.io/badge/已满-186866453-blue.svg)](https://jq.qq.com/?_wv=1027&k=VvjN2nvu) [![加入QQ群](https://img.shields.io/badge/已满-201396349-blue.svg)](https://jq.qq.com/?_wv=1027&k=5vYAqA05) [![加入QQ群](https://img.shields.io/badge/已满-101456076-blue.svg)](https://jq.qq.com/?_wv=1027&k=kOIINEb5) [![加入QQ群](https://img.shields.io/badge/已满-101539465-blue.svg)](https://jq.qq.com/?_wv=1027&k=UKtX5jhs) [![加入QQ群](https://img.shields.io/badge/已满-264312783-blue.svg)](https://jq.qq.com/?_wv=1027&k=EI9an8lJ) [![加入QQ群](https://img.shields.io/badge/已满-167385320-blue.svg)](https://jq.qq.com/?_wv=1027&k=SWCtLnMz) [![加入QQ群](https://img.shields.io/badge/已满-104748341-blue.svg)](https://jq.qq.com/?_wv=1027&k=96Dkdq0k) [![加入QQ群](https://img.shields.io/badge/已满-160110482-blue.svg)](https://jq.qq.com/?_wv=1027&k=0fsNiYZt) [![加入QQ群](https://img.shields.io/badge/已满-170801498-blue.svg)](https://jq.qq.com/?_wv=1027&k=7xw4xUG1) [![加入QQ群](https://img.shields.io/badge/已满-108482800-blue.svg)](https://jq.qq.com/?_wv=1027&k=eCx8eyoJ) [![加入QQ群](https://img.shields.io/badge/已满-101046199-blue.svg)](https://jq.qq.com/?_wv=1027&k=SpyH2875) [![加入QQ群](https://img.shields.io/badge/已满-136919097-blue.svg)](https://jq.qq.com/?_wv=1027&k=tKEt51dz) [![加入QQ群](https://img.shields.io/badge/已满-143961921-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=0vBbSb0ztbBgVtn3kJS-Q4HUNYwip89G&authKey=8irq5PhutrZmWIvsUsklBxhj57l%2F1nOZqjzigkXZVoZE451GG4JHPOqW7AW6cf0T&noverify=0&group_code=143961921) [![加入QQ群](https://img.shields.io/badge/已满-174951577-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZFAPAbp09S2ltvwrJzp7wGlbopsc0rwi&authKey=HB2cxpxP2yspk%2Bo3WKTBfktRCccVkU26cgi5B16u0KcAYrVu7sBaE7XSEqmMdFQp&noverify=0&group_code=174951577) [![加入QQ群](https://img.shields.io/badge/已满-161281055-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=Fn2aF5IHpwsy8j6VlalNJK6qbwFLFHat&authKey=uyIT%2B97x2AXj3odyXpsSpVaPMC%2Bidw0LxG5MAtEqlrcBcWJUA%2FeS43rsF1Tg7IRJ&noverify=0&group_code=161281055) [![加入QQ群](https://img.shields.io/badge/138988063-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=XIzkm_mV2xTsUtFxo63bmicYoDBA6Ifm&authKey=dDW%2F4qsmw3x9govoZY9w%2FoWAoC4wbHqGal%2BbqLzoS6VBarU8EBptIgPKN%2FviyC8j&noverify=0&group_code=138988063) 点击按钮入群。
