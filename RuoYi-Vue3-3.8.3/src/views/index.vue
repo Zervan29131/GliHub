@@ -127,14 +127,14 @@
             <p>
               <i class="el-icon-chat-dot-round"></i> 微信：<a
                 href="javascript:;"
-                >/ *若依</a
+                >/ *Zervan</a
               >
             </p>
             <p>
               <i class="el-icon-money"></i> 支付宝：<a
                 href="javascript:;"
                 class="支付宝信息"
-                >/ *若依</a
+                >/ *Zervan</a
               >
             </p>
           </div>
@@ -956,7 +956,7 @@
             </el-collapse-item>
             <el-collapse-item title="v1.0.0 - 2019-10-08">
               <ol>
-                <li>若依前后端分离系统正式发布</li>
+                <li>Zervan前后端分离系统正式发布</li>
               </ol>
             </el-collapse-item>
           </el-collapse>

@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="设备编码" prop="postCode">
+      <el-form-item label="设备编号" prop="postCode">
         <el-input v-model="queryParams.postCode" placeholder="请输入设备编码" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="设备名称" prop="postName">
@@ -97,7 +97,7 @@
         <el-form-item label="设备状态" prop="status">
           <el-radio-group v-model="form.status">
             <el-radio v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.value">{{
-      dict.label }}</el-radio>
+              dict.label }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
