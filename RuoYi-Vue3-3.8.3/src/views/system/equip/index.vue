@@ -41,18 +41,23 @@
             <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        
+
         <el-table v-loading="loading" :data="postList" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" align="center" />
             <el-table-column label="设备编号" align="center" prop="postId" />
             <el-table-column label="设备名称" align="center" prop="postName" />
+
+            <!-- <el-table-column label="岗位排序" align="center" prop="postSort" /> -->
+
             <el-table-column label="设备型号" align="center" prop="postCode" />
             <el-table-column label="存放地点" align="center" prop="postPlace" />
             <el-table-column label="保管人员" align="center" prop="postPerson" />
             <el-table-column label="联系方式" align="center" prop="postContect" />
             <el-table-column label="运行使用情况" align="center" prop="status">
                 <template #default="scope">
-                    <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
+                    <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
+
+                    <!-- <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" /> -->
                 </template>
             </el-table-column>
             <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -60,41 +65,16 @@
                     <span>{{ parseTime(scope.row.createTime) }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+            <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
                 <template #default="scope">
-                    <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+                    <el-button size="mini" type="text" icon="Edit" @click="handleUpdate(scope.row)"
                         v-hasPermi="['system:post:edit']">修改</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+                    <el-button size="mini" type="text" icon="Delete" @click="handleDelete(scope.row)"
                         v-hasPermi="['system:post:remove']">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
 
-        <!-- <el-table v-loading="loading" :data="postList" @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="55" align="center" />
-            <el-table-column label="设备编号" align="center" prop="postId" />
-            <el-table-column label="设备编码" align="center" prop="postCode" />
-            <el-table-column label="设备名称" align="center" prop="postName" />
-            <el-table-column label="设备排序" align="center" prop="postSort" />
-            <el-table-column label="状态" align="center" prop="status">
-                <template #default="scope">
-                    <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
-                </template>
-            </el-table-column>
-            <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-                <template #default="scope">
-                    <span>{{ parseTime(scope.row.createTime) }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-                <template #default="scope">
-                    <el-button type="text" icon="Edit" @click="handleUpdate(scope.row)"
-                        v-hasPermi="['system:post:edit']">修改</el-button>
-                    <el-button type="text" icon="Delete" @click="handleDelete(scope.row)"
-                        v-hasPermi="['system:post:remove']">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table> -->
 
         <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum"
             v-model:limit="queryParams.pageSize" @pagination="getList" />
@@ -111,18 +91,18 @@
                 <el-form-item label="设备型号" prop="postCode">
                     <el-input v-model="form.postCode" placeholder="请输入设备型号" />
                 </el-form-item>
-                <!-- <el-form-item label="存放地点" prop="postPlace">
+                <el-form-item label="存放地点" prop="postPlace">
                     <el-select v-model="form.postPlace" placeholder="请选择存放地点">
                         <el-option v-for="(item, index) in postPlacedata" :key="index" :label="item.label"
                             :value="item.value" :disabled="item.disabled"></el-option>
                     </el-select>
-                </el-form-item> -->
-                <!-- <el-form-item label="保管人员" prop="postPerson">
+                </el-form-item>
+                <el-form-item label="保管人员" prop="postPerson">
                     <el-select v-model="form.postPerson" placeholder="请选择保管人员">
                         <el-option v-for="(item, index) in postPersondata" :key="index" :label="item.label"
                             :value="item.value" :disabled="item.disabled"></el-option>
                     </el-select>
-                </el-form-item> -->
+                </el-form-item>
                 <el-form-item label="联系方式" prop="postContact">
                     <el-input v-model="form.postContact" placeholder="请输入联系方式" />
                 </el-form-item>
@@ -191,12 +171,12 @@ const data = reactive({
         postCode: [
           { required: true, message: "设备型号不能为空", trigger: "blur" }
         ],
-        postPerson: [
-          { required: true, message: "保管人员不能为空", trigger: "blur" }
-        ],
-        postPlace: [
-          { required: true, message: "存放地点不能为空", trigger: "blur" }
-        ],
+        // postPerson: [
+        //   { required: true, message: "保管人员不能为空", trigger: "blur" }
+        // ],
+        // postPlace: [
+        //   { required: true, message: "存放地点不能为空", trigger: "blur" }
+        // ],
       },
          //新增设备数据
      postPlacedata: [{

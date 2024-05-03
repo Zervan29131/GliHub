@@ -112,6 +112,7 @@ public class SysPost extends BaseEntity
             .append("postId", getPostId())
             .append("postCode", getPostCode())
             .append("postName", getPostName())
+
             .append("postSort", getPostSort())
             .append("status", getStatus())
             .append("createBy", getCreateBy())

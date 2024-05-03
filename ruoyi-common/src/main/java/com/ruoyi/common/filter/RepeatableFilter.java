@@ -36,6 +36,7 @@ public class RepeatableFilter implements Filter
         }
         if (null == requestWrapper)
         {
+            System.out.println(request);
             chain.doFilter(request, response);
         }
         else
