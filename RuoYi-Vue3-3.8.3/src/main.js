@@ -11,6 +11,7 @@ import App from './App'
 import store from './store'
 import router from './router'
 import directive from './directive' // directive
+import 'element-plus/dist/index.css';
 
 
 // 注册指令

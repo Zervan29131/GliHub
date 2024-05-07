@@ -1,6 +1,6 @@
 <template>
     <div class="app-container">
-        <el-form :model="queryParams" ref="queryRef"  :inline="true" v-show="showSearch" label-width="68px">
+        <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
             <el-form-item label="设备编码" prop="postCode">
                 <el-input v-model="queryParams.postCode" placeholder="请输入设备编码" clearable @keyup.enter="handleQuery" />
             </el-form-item>
@@ -9,8 +9,7 @@
             </el-form-item>
             <el-form-item label="状态" prop="status">
                 <el-select v-model="queryParams.status" placeholder="设备状态" clearable>
-                    <el-option v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.label"
-                        :value="dict.value" />
+                    <el-option v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.label" :value="dict.value" />
                 </el-select>
             </el-form-item>
             <el-form-item>
@@ -112,7 +111,7 @@
                             dict.label }}</el-radio>
                     </el-radio-group>
                 </el-form-item> -->
-<!-- 
+                <!-- 
                 <el-form-item label="设备顺序" prop="postSort">
                     <el-input-number v-model="form.postSort" controls-position="right" :min="0" />
                 </el-form-item> -->
@@ -135,7 +134,7 @@
             </template>
         </el-dialog>
 
-        
+
     </div>
 </template>
 
@@ -166,10 +165,10 @@ const data = reactive({
     },
     rules: {
         postName: [
-          { required: true, message: "设备名称不能为空", trigger: "blur" }
+            { required: true, message: "设备名称不能为空", trigger: "blur" }
         ],
         postCode: [
-          { required: true, message: "设备型号不能为空", trigger: "blur" }
+            { required: true, message: "设备型号不能为空", trigger: "blur" }
         ],
         // postPerson: [
         //   { required: true, message: "保管人员不能为空", trigger: "blur" }
@@ -177,24 +176,24 @@ const data = reactive({
         // postPlace: [
         //   { required: true, message: "存放地点不能为空", trigger: "blur" }
         // ],
-      },
-         //新增设备数据
-     postPlacedata: [{
+    },
+    //新增设备数据
+    postPlacedata: [{
         "label": "作业区一",
         "value": 1
-      }, {
+    }, {
         "label": "作业区二",
         "value": 2
-      }],
-      postPersondata: [{
+    }],
+    postPersondata: [{
         "label": "张三",
         "value": 1
-      }, {
+    }, {
         "label": "李四",
         "value": 2
-      }],
+    }],
 });
-  
+
 
 const { queryParams, form, rules } = toRefs(data);
 
