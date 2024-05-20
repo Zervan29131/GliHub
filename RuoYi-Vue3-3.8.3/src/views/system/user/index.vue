@@ -28,8 +28,8 @@
          <!--用户数据-->
          <el-col :span="20" :xs="24">
             <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-               <el-form-item label="用户名称" prop="userName">
-                  <el-input v-model="queryParams.userName" placeholder="请输入用户名称" clearable style="width: 240px"
+               <el-form-item label="员工姓名" prop="userName">
+                  <el-input v-model="queryParams.userName" placeholder="请输入" clea员工姓名rable style="width: 240px"
                      @keyup.enter="handleQuery" />
                </el-form-item>
                <el-form-item label="手机号码" prop="phonenumber">
@@ -78,10 +78,10 @@
 
             <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
                <el-table-column type="selection" width="50" align="center" />
-               <el-table-column label="用户编号" align="center" key="userId" prop="userId" v-if="columns[0].visible" />
-               <el-table-column label="用户名称" align="center" key="userName" prop="userName" v-if="columns[1].visible"
+               <el-table-column label="员工id" align="center" key="userId" prop="userId" v-if="columns[0].visible" />
+               <el-table-column label="员工姓名" align="center" key="userName" prop="userName" v-if="columns[1].visible"
                   :show-overflow-tooltip="true" />
-               <el-table-column label="用户昵称" align="center" key="nickName" prop="nickName" v-if="columns[2].visible"
+               <el-table-column label="用户名" align="center" key="nickName" prop="nickName" v-if="columns[2].visible"
                   :show-overflow-tooltip="true" />
                <el-table-column label="所属作业区" align="center" key="deptName" prop="dept.deptName" v-if="columns[3].visible"
                   :show-overflow-tooltip="true" />
@@ -129,8 +129,8 @@
          <el-form :model="form" :rules="rules" ref="userRef" label-width="80px">
             <el-row>
                <el-col :span="12">
-                  <el-form-item label="用户昵称" prop="nickName">
-                     <el-input v-model="form.nickName" placeholder="请输入用户昵称" maxlength="30" />
+                  <el-form-item label="用户名" prop="nickName">
+                     <el-input v-model="form.nickName" placeholder="请输入用户名" maxlength="30" />
                   </el-form-item>
                </el-col>
                <el-col :span="12">
@@ -155,20 +155,20 @@
             </el-row>
             <el-row>
                <el-col :span="12">
-                  <el-form-item v-if="form.userId == undefined" label="用户名称" prop="userName">
-                     <el-input v-model="form.userName" placeholder="请输入用户名称" maxlength="30" />
+                  <el-form-item v-if="form.userId == undefined" label="员工姓名" prop="userName">
+                     <el-input v-model="form.userName" placeholder="请输入员工姓名" maxlength="30" />
                   </el-form-item>
                </el-col>
                <el-col :span="12">
-                  <el-form-item v-if="form.userId == undefined" label="用户密码" prop="password">
-                     <el-input v-model="form.password" placeholder="请输入用户密码" type="password" maxlength="20"
+                  <el-form-item v-if="form.userId == undefined" label="密码" prop="password">
+                     <el-input v-model="form.password" placeholder="请输入密码" type="password" maxlength="20"
                         show-password />
                   </el-form-item>
                </el-col>
             </el-row>
             <el-row>
                <el-col :span="12">
-                  <el-form-item label="用户性别">
+                  <el-form-item label="性别">
                      <el-select v-model="form.sex" placeholder="请选择">
                         <el-option v-for="dict in sys_user_sex" :key="dict.value" :label="dict.label"
                            :value="dict.value"></el-option>
@@ -194,7 +194,7 @@
                   </el-form-item>
                </el-col>
                <el-col :span="12">
-                  <el-form-item label="角色">
+                  <el-form-item label="权限">
                      <el-select v-model="form.roleIds" multiple placeholder="请选择">
                         <el-option v-for="item in roleOptions" :key="item.roleId" :label="item.roleName"
                            :value="item.roleId" :disabled="item.status == 1"></el-option>
@@ -488,7 +488,7 @@ function handleAdd() {
       postOptions.value = response.posts;
       roleOptions.value = response.roles;
       open.value = true;
-      title.value = "添加用户";
+      title.value = "信息添加";
       form.value.password = initPassword.value;
    });
 };

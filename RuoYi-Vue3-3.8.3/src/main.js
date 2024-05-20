@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+// import { Cell, CellGroup } from 'vant';
 
 import Cookies from 'js-cookie'
 
@@ -78,5 +79,6 @@ app.use(ElementPlus, {
   // 支持 large、default、small
   size: Cookies.get('size') || 'default'
 })
+
 
 app.mount('#app')

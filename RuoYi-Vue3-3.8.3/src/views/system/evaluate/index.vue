@@ -52,9 +52,7 @@
 				</el-form>
 			</el-tab-pane>
 
-			<!-- 事故模拟分析法 -->
-			<el-tab-pane label="事故后果模拟法">事故后果模拟法</el-tab-pane>
-
+	
 			<!-- 安全检查表法 -->
 			<el-tab-pane label="安全检查表法">
 				<el-table :data="tableData" style="width: 100%">
@@ -80,6 +78,9 @@
 				<el-button class="mt-4" style="width: 30%" type="primary" @click="onAddItem">添加检查项目</el-button>
 				<el-button class="mt-4" style="width: 30%" type="primary" @click="onAddItem">导出该表</el-button>
 			</el-tab-pane>
+
+					<!-- 事故模拟分析法 -->
+					<el-tab-pane label="爆炸指数危险评价法">爆炸指数危险评价法</el-tab-pane>
 
 		</el-tabs>
 	</div>

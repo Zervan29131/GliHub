@@ -1,19 +1,27 @@
 <template>
     <div class="app-container">
         <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-            <el-form-item label="设备编码" prop="postCode">
-                <el-input v-model="queryParams.postCode" placeholder="请输入设备编码" clearable @keyup.enter="handleQuery" />
+            <el-form-item label="隐患内容" prop="postCode">
+                <el-input v-model="queryParams.postCode" placeholder="请输入隐患内容" clearable @keyup.enter="handleQuery" />
             </el-form-item>
-            <el-form-item label="设备名称" prop="postName">
-                <el-input v-model="queryParams.postName" placeholder="请输入设备名称" clearable @keyup.enter="handleQuery" />
+            <el-form-item label="隐患类型" prop="postName">
+                <el-input v-model="queryParams.postName" placeholder="请输入隐患类型" clearable @keyup.enter="handleQuery" />
             </el-form-item>
+            <!-- <el-form-item label="风险等级" prop="postName">
+          <el-input v-model="queryParams.postName" placeholder="请输入风险等级" clearable @keyup.enter="handleQuery" />
+        </el-form-item> -->
+            <el-form-item label="选择日期" prop="postName">
+                <el-input v-model="queryParams.postName" placeholder="请输入选择日期" clearable @keyup.enter="handleQuery" />
+            </el-form-item>
+
             <el-form-item label="状态" prop="status">
-                <el-select v-model="queryParams.status" placeholder="设备状态" clearable>
-                    <el-option v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.label" :value="dict.value" />
+                <el-select v-model="queryParams.status" placeholder="是否停用" clearable>
+                    <el-option v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.label"
+                        :value="dict.value" />
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+                <el-button type="primary" icon="Search" @click="handleQuery">查询</el-button>
                 <el-button icon="Refresh" @click="resetQuery">重置</el-button>
             </el-form-item>
         </el-form>
@@ -23,7 +31,7 @@
         <el-row :gutter="10" class="mb8">
             <el-col :span="1.5">
                 <el-button type="primary" plain icon="Plus" @click="handleAdd"
-                    v-hasPermi="['system:post:add']">新增</el-button>
+                    v-hasPermi="['system:post:add']">添加</el-button>
             </el-col>
             <el-col :span="1.5">
                 <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate"
@@ -41,29 +49,16 @@
         </el-row>
 
 
-        <el-table v-loading="loading" :data="postList" @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="55" align="center" />
-            <el-table-column label="设备编号" align="center" prop="postId" />
-            <el-table-column label="设备名称" align="center" prop="postName" width="300"/>
+        <el-table :data="tableData" style="width: 100%">
 
-            <!-- <el-table-column label="岗位排序" align="center" prop="postSort" /> -->
+            <el-table-column prop="aaa01" align="center" label="隐患类型" />
+            <el-table-column prop="aaa02" align="center" label="隐患内容" />
+            <el-table-column prop="aaa03" align="center" label="隐患分级" />
+            <el-table-column prop="aaa04" align="center" label="排查依据" />
+            <el-table-column prop="aaa05" align="center" label="排查日期" width="110" />
+            <el-table-column prop="aaa06" align="center" label="描述" width="300" />
+            <el-table-column prop="aaa07" align="center" label="负责人" width="60" />
 
-            <el-table-column label="设备型号" align="center" prop="postCode"  />
-            <el-table-column label="存放地点" align="center" prop="postPlace" width="100"/>
-            <el-table-column label="保管人员" align="center" prop="postPerson" width="100"/>
-            <el-table-column label="联系方式" align="center" prop="postContect" width="100"/>
-            <el-table-column label="运行使用情况" align="center" prop="status">
-                <template #default="scope">
-                    <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
-
-                    <!-- <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" /> -->
-                </template>
-            </el-table-column>
-            <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-                <template #default="scope">
-                    <span>{{ parseTime(scope.row.createTime) }}</span>
-                </template>
-            </el-table-column>
             <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
                 <template #default="scope">
                     <el-button size="mini" type="text" icon="Edit" @click="handleUpdate(scope.row)"
@@ -72,32 +67,41 @@
                         v-hasPermi="['system:post:remove']">删除</el-button>
                 </template>
             </el-table-column>
-        </el-table>
 
+        </el-table>
 
         <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum"
             v-model:limit="queryParams.pageSize" @pagination="getList" />
 
         <!-- 添加或修改设备对话框 -->
-        <el-dialog :title="title" v-model="open" width="500px" append-to-body>
+        <el-dialog :title="title" v-model="open" width="400px" append-to-body>
             <el-form ref="postRef" :model="form" :rules="rules" label-width="80px">
-                <el-form-item label="设备名称" prop="postName">
-                    <el-input v-model="form.postName" placeholder="请输入设备名称" />
-                </el-form-item>
-                <!-- <el-form-item label="设备编码" prop="postCode">
-                    <el-input v-model="form.postCode" placeholder="请输入编码名称" />
-                </el-form-item> -->
-                <el-form-item label="设备型号" prop="postCode">
-                    <el-input v-model="form.postCode" placeholder="请输入设备型号" />
-                </el-form-item>
-                <el-form-item label="存放地点" prop="postPlace">
-                    <el-select v-model="form.postPlace" placeholder="请选择存放地点">
+             
+                <el-form-item label="隐患类型" prop="postPlace">
+                    <el-select v-model="form.postPlace" placeholder="请选择隐患类型">
                         <el-option v-for="(item, index) in postPlacedata" :key="index" :label="item.label"
                             :value="item.value" :disabled="item.disabled"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="保管人员" prop="postPerson">
-                    <el-select v-model="form.postPerson" placeholder="请选择保管人员">
+                
+                <!-- <el-form-item label="设备编码" prop="postCode">
+                    <el-input v-model="form.postCode" placeholder="请输入编码名称" />
+                </el-form-item> -->
+                <el-form-item label="隐患内容" prop="postCode">
+                    <el-input v-model="form.postCode" placeholder="请输入隐患内容" />
+                </el-form-item> 
+                <el-form-item label="隐患分级" prop="postCode">
+                    <el-select v-model="form.postPlace" placeholder="请进行隐患分级">
+                        <el-option v-for="(item, index) in postPlacedata" :key="index" :label="item.label"
+                            :value="item.value" :disabled="item.disabled"></el-option>
+                    </el-select>
+                </el-form-item> 
+                <el-form-item label="排查依据" prop="postCode">
+                    <el-input v-model="form.postCode" placeholder="请输入排查依据" />
+                </el-form-item>
+       -->
+                <el-form-item label="排查人" prop="postPerson">
+                    <el-select v-model="form.postPerson" placeholder="请选择排查人员">
                         <el-option v-for="(item, index) in postPersondata" :key="index" :label="item.label"
                             :value="item.value" :disabled="item.disabled"></el-option>
                     </el-select>
@@ -116,12 +120,12 @@
                     <el-input-number v-model="form.postSort" controls-position="right" :min="0" />
                 </el-form-item> -->
 
-                <el-form-item label="设备状态" prop="status">
+                <!-- <el-form-item label="设备状态" prop="status">
                     <el-radio-group v-model="form.status">
                         <el-radio v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.value">{{ dict.label
                             }}</el-radio>
                     </el-radio-group>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="备注" prop="remark">
                     <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
                 </el-form-item>
@@ -194,6 +198,27 @@ const data = reactive({
     }],
 });
 
+const tableData = [
+    {
+        aaa01: '危化品分类存储',
+        aaa02: '不同类别危化品混放',
+        aaa03: '严重隐患',
+        aaa04: '危险化学品储存通则',
+        aaa05: '2024/05/01',
+        aaa06: '立即重新分类并隔离存储',
+        aaa07: '赵主管',
+
+    },
+    {
+        aaa01: '通风与排气',
+        aaa02: '仓库通风不良，有积聚气体风险',
+        aaa03: '中度隐患',
+        aaa04: '危险化学品储存场所通风要求',
+        aaa05: '2024/04/01',
+        aaa06: '加强通风设备检查与维护，确保良好通风',
+        aaa07: '陈工程师',
+    },
+]
 
 const { queryParams, form, rules } = toRefs(data);
 
@@ -243,7 +268,7 @@ function handleSelectionChange(selection) {
 function handleAdd() {
     reset();
     open.value = true;
-    title.value = "添加设备";
+    title.value = "隐患信息录入";
 }
 /** 修改按钮操作 */
 function handleUpdate(row) {
@@ -293,4 +318,8 @@ function handleExport() {
 }
 
 getList();
+
+
+
+
 </script>

@@ -34,7 +34,7 @@
                icon="Plus"
                @click="openSelectUser"
                v-hasPermi="['system:role:add']"
-            >添加用户</el-button>
+            >信息添加</el-button>
          </el-col>
          <el-col :span="1.5">
             <el-button

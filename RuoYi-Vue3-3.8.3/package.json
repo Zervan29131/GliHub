@@ -28,7 +28,9 @@
     "pinia": "2.0.14",
     "vue": "3.2.31",
     "vue-cropper": "1.0.3",
-    "vue-router": "4.0.14"
+    "vue-iframe": "^0.0.0",
+    "vue-router": "4.0.14",
+    "vue-video-player": "^6.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "2.3.3",
