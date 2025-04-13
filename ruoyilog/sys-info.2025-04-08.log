@@ -1,0 +1,22 @@
+18:55:44.197 [background-preinit] INFO  o.h.v.i.util.Version - [<clinit>,21] - HV000001: Hibernate Validator 6.2.5.Final
+18:55:44.197 [restartedMain] INFO  c.r.RuoYiApplication - [logStarting,55] - Starting RuoYiApplication using Java 17.0.14 on NickdeMacBook-Pro.local with PID 74575 (/Users/zervan.cn/Documents/GitHub/GliHub/ruoyi-admin/target/classes started by zervan.cn in /Users/zervan.cn/Documents/GitHub/GliHub)
+18:55:44.198 [restartedMain] INFO  c.r.RuoYiApplication - [logStartupProfileInfo,686] - The following 1 profile is active: "druid"
+18:55:45.308 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Initializing ProtocolHandler ["http-nio-8080"]
+18:55:45.308 [restartedMain] INFO  o.a.c.c.StandardService - [log,173] - Starting service [Tomcat]
+18:55:45.308 [restartedMain] INFO  o.a.c.c.StandardEngine - [log,173] - Starting Servlet engine: [Apache Tomcat/9.0.75]
+18:55:45.341 [restartedMain] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring embedded WebApplicationContext
+18:55:46.231 [restartedMain] INFO  c.a.d.p.DruidDataSource - [init,1009] - {dataSource-1} inited
+18:55:46.232 [restartedMain] INFO  c.a.d.p.DruidDataSource - [close,2174] - {dataSource-1} closing ...
+18:55:46.232 [restartedMain] INFO  c.a.d.p.DruidDataSource - [close,2247] - {dataSource-1} closed
+18:55:46.240 [restartedMain] INFO  o.a.c.c.StandardService - [log,173] - Stopping service [Tomcat]
+19:13:16.752 [restartedMain] INFO  c.r.RuoYiApplication - [logStarting,55] - Starting RuoYiApplication using Java 17.0.14 on NickdeMacBook-Pro.local with PID 76031 (/Users/zervan.cn/Documents/GitHub/GliHub/ruoyi-admin/target/classes started by zervan.cn in /Users/zervan.cn/Documents/GitHub/GliHub)
+19:13:16.753 [background-preinit] INFO  o.h.v.i.util.Version - [<clinit>,21] - HV000001: Hibernate Validator 6.2.5.Final
+19:13:16.753 [restartedMain] INFO  c.r.RuoYiApplication - [logStartupProfileInfo,686] - The following 1 profile is active: "druid"
+19:13:17.902 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Initializing ProtocolHandler ["http-nio-8080"]
+19:13:17.903 [restartedMain] INFO  o.a.c.c.StandardService - [log,173] - Starting service [Tomcat]
+19:13:17.903 [restartedMain] INFO  o.a.c.c.StandardEngine - [log,173] - Starting Servlet engine: [Apache Tomcat/9.0.75]
+19:13:17.939 [restartedMain] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring embedded WebApplicationContext
+19:13:19.109 [restartedMain] INFO  c.a.d.p.DruidDataSource - [init,1009] - {dataSource-1} inited
+19:13:19.327 [restartedMain] INFO  c.a.d.p.DruidDataSource - [close,2174] - {dataSource-1} closing ...
+19:13:19.331 [restartedMain] INFO  c.a.d.p.DruidDataSource - [close,2247] - {dataSource-1} closed
+19:13:19.444 [restartedMain] INFO  o.a.c.c.StandardService - [log,173] - Stopping service [Tomcat]
