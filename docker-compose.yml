@@ -1,9 +1,16 @@
-version: "3.9"
+# ============================================================================
+# GliHub 3.0 多 Profile 跨平台容器编排 (macOS / Windows WSL2 / Linux amd64 & arm64)
+#
+# 1) 0-AI 纯核心确定性底座启动:  docker compose up -d
+# 2) 无独显 CPU INT8 推荐启动:   docker compose --profile cpu-int8 up -d
+# 3) 本地 Q4_K_M 全离线启动:     docker compose --profile local-q4 up -d
+# 4) 联同独立边缘节点一起启动:   docker compose --profile cpu-int8 --profile edge up -d
+# ============================================================================
 
 services:
   postgres:
-    image: pgvector/pgvector:pg16
-    container_name: glihub-postgres
+    image: pgvector/pgvector:pg18
+    container_name: glihub-pg18
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-glihub}
@@ -13,43 +20,91 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - pg_data:/var/lib/postgresql/data
-      - ./sql/glihub.sql:/docker-entrypoint-initdb.d/01-glihub.sql:ro
-      - ./sql/glihub_v2_upgrade.sql:/docker-entrypoint-initdb.d/02-glihub-v2.sql:ro
+      - ${GLIHUB_DATA_DIR:-./data}/pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-glihub}"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 12
 
-  redis:
-    image: redis:7-alpine
-    container_name: glihub-redis
+  valkey:
+    image: valkey/valkey:9-alpine
+    container_name: glihub-valkey9
     restart: unless-stopped
+    command: ["valkey-server", "--appendonly", "yes"]
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "${VALKEY_PORT:-6379}:6379"
     volumes:
-      - redis_data:/data
+      - ${GLIHUB_DATA_DIR:-./data}/valkey:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "valkey-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 10
 
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: glihub-backend-jdk25
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8080
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-glihub}
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      REDIS_HOST: valkey
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      AI_SERVICE_URL: http://ai-service:8090
+      AI_OUTPUT_DIR: /data/ai_outputs
+      SAMPLE_IMAGE_DIR: /data/calib_samples
+      GLIHUB_MODELS_DIR: /data/models
+      GLIHUB_EDGE_SNAPS_DIR: /data/edge_snaps
+      GLIHUB_UPLOAD_PATH: /data/uploads
+      EDGE_SHARED_TOKEN: ${EDGE_SHARED_TOKEN:-glihub-edge-shared-token-v3}
+      JWT_SECRET: ${JWT_SECRET:-glihub-v3-industrial-ehs-jwt-hmac-secret-key-2026-secure}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    volumes:
+      - ${GLIHUB_DATA_DIR:-./data}:/data
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: glihub-frontend-vue35
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-8088}:80"
+
   ai-service:
+    profiles: ["cpu-int8", "local-q4", "gpu-pro", "ai"]
     build:
       context: ./ai-service
       dockerfile: Dockerfile
-    container_name: glihub-ai-service
+      args:
+        AI_EXTRAS: ${AI_EXTRAS:---extra cpu-int8}
+    container_name: glihub-ai-service-v3
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
     environment:
+      DEPLOY_PROFILE: ${DEPLOY_PROFILE:-cpu-int8}
+      DEFAULT_PRECISION: int8
       AI_SERVICE_HOST: 0.0.0.0
       AI_SERVICE_PORT: 8090
-      YOLOV5_REPO_DIR: /app/yolov5target-main
-      OUTPUT_DIR: /app/ai-service/outputs
+      DATA_DIR: /data
+      MODELS_DIR: /data/models
+      OUTPUT_DIR: /data/ai_outputs
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: ${POSTGRES_DB:-glihub}
@@ -57,64 +112,42 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       VLM_BASE_URL: ${VLM_BASE_URL:-http://host.docker.internal:11434/v1}
       VLM_API_KEY: ${VLM_API_KEY:-}
-      VLM_MODEL: ${VLM_MODEL:-qwen2.5vl:7b}
+      VLM_MODEL: ${VLM_MODEL:-qwen3-vl:4b}
       LLM_BASE_URL: ${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
       LLM_API_KEY: ${LLM_API_KEY:-}
       LLM_MODEL: ${LLM_MODEL:-qwen3:8b}
-      EMBEDDING_BASE_URL: ${EMBEDDING_BASE_URL:-}
-      EMBEDDING_API_KEY: ${EMBEDDING_API_KEY:-}
-      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-Qwen/Qwen3-Embedding-0.6B}
     ports:
       - "${AI_SERVICE_PORT:-8090}:8090"
     volumes:
-      - ./yolov5target-main:/app/yolov5target-main:ro
-      - ai_outputs:/app/ai-service/outputs
+      - ${GLIHUB_DATA_DIR:-./data}:/data
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: glihub-backend
+  ollama:
+    profiles: ["local-q4"]
+    image: ollama/ollama:latest
+    container_name: glihub-ollama-q4
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      ai-service:
-        condition: service_started
-    environment:
-      SERVER_PORT: 8080
-      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-glihub}
-      DB_USERNAME: ${POSTGRES_USER:-postgres}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      AI_SERVICE_URL: http://ai-service:8090
-      AI_OUTPUT_DIR: /app/ai-outputs
-      SAMPLE_IMAGE_DIR: /app/sample-images
-      GLIHUB_UPLOAD_PATH: /app/upload
     ports:
-      - "${BACKEND_PORT:-8080}:8080"
+      - "11434:11434"
     volumes:
-      - backend_uploads:/app/upload
-      - ai_outputs:/app/ai-outputs:ro
-      - ./yolov5target-main/data/images:/app/sample-images:ro
+      - ${GLIHUB_DATA_DIR:-./data}/ollama:/root/.ollama
 
-  frontend:
+  edge-yolo26:
+    profiles: ["edge"]
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: glihub-frontend
+      context: ./edge-yolo26
+      dockerfile: Dockerfile.edge
+    container_name: glihub-edge-yolo26
     restart: unless-stopped
-    depends_on:
-      - backend
+    environment:
+      EDGE_NODE_CODE: edge-docker-01
+      EDGE_NODE_NAME: 容器化边缘视觉节点
+      EDGE_CENTER_URL: http://backend:8080
+      EDGE_TOKEN: ${EDGE_SHARED_TOKEN:-glihub-edge-shared-token-v3}
+      EDGE_PRECISION: int8
+      EDGE_PRIMARY_MODEL: /data/models/yolo26n.int8.onnx
+      EDGE_HELMET_MODEL: /data/models/yolov5_helmet.int8.onnx
     ports:
-      - "${FRONTEND_PORT:-8088}:80"
-
-volumes:
-  pg_data:
-  redis_data:
-  ai_outputs:
-  backend_uploads:
+      - "${EDGE_PORT:-8091}:8091"
+    volumes:
+      - ${GLIHUB_DATA_DIR:-./data}/models:/data/models:ro
+      - ${GLIHUB_DATA_DIR:-./data}/calib_samples:/data/calib_samples:ro

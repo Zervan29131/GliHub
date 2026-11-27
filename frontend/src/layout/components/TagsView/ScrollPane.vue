@@ -12,40 +12,51 @@
 <script setup>
 import useTagsViewStore from '@/store/modules/tagsView'
 
-const tagAndTagSpacing = ref(4);
-const { proxy } = getCurrentInstance();
+const tagAndTagSpacing = ref(4)
+const scrollContainer = ref(null)
+const emits = defineEmits(['scroll'])
 
-const scrollWrapper = computed(() => proxy.$refs.scrollContainer.$refs.wrap$);
-
-onMounted(() => {
-  scrollWrapper.value.addEventListener('scroll', emitScroll, true)
-})
-onBeforeUnmount(() => {
-  scrollWrapper.value.removeEventListener('scroll', emitScroll)
+const scrollWrapper = computed(() => {
+  const inst = scrollContainer.value
+  if (!inst) return null
+  return inst.wrapRef || (inst.$refs && inst.$refs.wrap$) || null
 })
 
-function handleScroll(e) {
-  const eventDelta = e.wheelDelta || -e.deltaY * 40
-  const $scrollWrapper = scrollWrapper.value;
-  $scrollWrapper.scrollLeft = $scrollWrapper.scrollLeft + eventDelta / 4
-}
-const emits = defineEmits()
 const emitScroll = () => {
   emits('scroll')
 }
 
+onMounted(() => {
+  if (scrollWrapper.value) {
+    scrollWrapper.value.addEventListener('scroll', emitScroll, { passive: true })
+  }
+})
+
+onBeforeUnmount(() => {
+  if (scrollWrapper.value) {
+    scrollWrapper.value.removeEventListener('scroll', emitScroll)
+  }
+})
+
+function handleScroll(e) {
+  const $scrollWrapper = scrollWrapper.value
+  if (!$scrollWrapper) return
+  const eventDelta = e.wheelDelta || -e.deltaY * 40
+  $scrollWrapper.scrollLeft = $scrollWrapper.scrollLeft + eventDelta / 4
+}
+
 const tagsViewStore = useTagsViewStore()
-const visitedViews = computed(() => tagsViewStore.visitedViews);
+const visitedViews = computed(() => tagsViewStore.visitedViews)
 
 function moveToTarget(currentTag) {
-  const $container = proxy.$refs.scrollContainer.$el
-  const $containerWidth = $container.offsetWidth
-  const $scrollWrapper = scrollWrapper.value;
+  const containerEl = scrollContainer.value?.$el
+  const $scrollWrapper = scrollWrapper.value
+  if (!containerEl || !$scrollWrapper) return
 
+  const $containerWidth = containerEl.offsetWidth
   let firstTag = null
   let lastTag = null
 
-  // find first tag and last tag
   if (visitedViews.value.length > 0) {
     firstTag = visitedViews.value[0]
     lastTag = visitedViews.value[visitedViews.value.length - 1]
@@ -56,25 +67,24 @@ function moveToTarget(currentTag) {
   } else if (lastTag === currentTag) {
     $scrollWrapper.scrollLeft = $scrollWrapper.scrollWidth - $containerWidth
   } else {
-    const tagListDom = document.getElementsByClassName('tags-view-item');
+    const tagListDom = document.getElementsByClassName('tags-view-item')
     const currentIndex = visitedViews.value.findIndex(item => item === currentTag)
+    if (currentIndex <= 0 || currentIndex >= visitedViews.value.length - 1) return
+
     let prevTag = null
     let nextTag = null
-    for (const k in tagListDom) {
-      if (k !== 'length' && Object.hasOwnProperty.call(tagListDom, k)) {
-        if (tagListDom[k].dataset.path === visitedViews.value[currentIndex - 1].path) {
-          prevTag = tagListDom[k];
-        }
-        if (tagListDom[k].dataset.path === visitedViews.value[currentIndex + 1].path) {
-          nextTag = tagListDom[k];
-        }
+    for (let i = 0; i < tagListDom.length; i++) {
+      const dom = tagListDom[i]
+      if (dom.dataset?.path === visitedViews.value[currentIndex - 1]?.path) {
+        prevTag = dom
+      }
+      if (dom.dataset?.path === visitedViews.value[currentIndex + 1]?.path) {
+        nextTag = dom
       }
     }
 
-    // the tag's offsetLeft after of nextTag
+    if (!nextTag || !prevTag) return
     const afterNextTagOffsetLeft = nextTag.offsetLeft + nextTag.offsetWidth + tagAndTagSpacing.value
-
-    // the tag's offsetLeft before of prevTag
     const beforePrevTagOffsetLeft = prevTag.offsetLeft - tagAndTagSpacing.value
     if (afterNextTagOffsetLeft > $scrollWrapper.scrollLeft + $containerWidth) {
       $scrollWrapper.scrollLeft = afterNextTagOffsetLeft - $containerWidth
@@ -85,11 +95,11 @@ function moveToTarget(currentTag) {
 }
 
 defineExpose({
-  moveToTarget,
+  moveToTarget
 })
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .scroll-container {
   white-space: nowrap;
   position: relative;

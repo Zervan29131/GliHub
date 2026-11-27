@@ -61,6 +61,8 @@ public class EhsClosedLoopService
     private ISysConfigService configService;
     @Autowired
     private AiServiceClient aiClient;
+    @Autowired
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     private String nextSerialNo(String prefix)
     {
@@ -102,8 +104,8 @@ public class EhsClosedLoopService
             JSONObject rt = runtimeMap.get(item.getModelCode());
             if (rt != null)
             {
-                item.setRuntimeReady(rt.getBooleanValue("native_ready") || rt.getBooleanValue("weights_exists"));
-                item.setRuntimeMessage(rt.getString("status_message"));
+                item.setRuntimeReady(rt.getBooleanValue("ready") || rt.getBooleanValue("native_ready") || rt.getBooleanValue("weights_exists"));
+                item.setRuntimeMessage(rt.getString("status") != null ? rt.getString("status") : rt.getString("status_message"));
             }
             else
             {
@@ -599,6 +601,14 @@ public class EhsClosedLoopService
         overview.put("totalEquipments", equips.size());
         overview.put("recentEvaluations", evals);
         overview.put("cameraPoints", visionMapper.selectCameraPointList(new EhsCameraPoint()));
+        try
+        {
+            overview.put("edgeNodes", jdbcTemplate.queryForList("SELECT * FROM ehs_edge_node ORDER BY node_id ASC"));
+        }
+        catch (Exception ignored)
+        {
+            overview.put("edgeNodes", List.of());
+        }
         return overview;
     }
 

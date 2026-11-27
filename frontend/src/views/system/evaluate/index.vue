@@ -26,9 +26,9 @@
       <el-form :inline="true" label-width="95px">
         <el-form-item label="评价场所">
           <el-radio-group v-model="placeType" @change="handlePlaceChange">
-            <el-radio-button label="production">生产场所评价</el-radio-button>
-            <el-radio-button label="storage">储存场所评价</el-radio-button>
-            <el-radio-button label="auxiliary">公辅场所评价</el-radio-button>
+            <el-radio-button value="production">生产场所评价</el-radio-button>
+            <el-radio-button value="storage">储存场所评价</el-radio-button>
+            <el-radio-button value="auxiliary">公辅场所评价</el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="评价作业区">

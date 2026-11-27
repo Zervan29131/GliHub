@@ -8,9 +8,13 @@ from api.routes import router as api_v1_router
 from config import settings
 
 app = FastAPI(
-    title="GliHub 2.0 AI-EHS Engine Service",
-    description="多模型工业视觉感知（YOLOv5本地权重 / YOLO26 / RF-DETR / YOLOE）、VLM 二次复核、EHS 法规 RAG 与安全评价/应急推演智能体服务",
-    version="2.0.0",
+    title="GliHub 3.0 Modular AI-EHS Engine Service",
+    description=(
+        "GliHub 3.0 端云协同 7 层可插拔选装 AI 引擎："
+        "mod-yolov5 / mod-yolo26 / mod-rfdetr / mod-yoloe / mod-vlm / mod-llm-rag / mod-ocr，"
+        "支持无独显 CPU INT8 / Q4_K_M 低精度推理与 0 选装安全降级运行。"
+    ),
+    version="3.0.0",
 )
 
 app.add_middleware(
@@ -30,9 +34,12 @@ app.include_router(api_v1_router)
 @app.get("/")
 async def root():
     return {
-        "service": "GliHub 2.0 AI-EHS Engine",
+        "service": "GliHub 3.0 Modular AI-EHS Engine",
+        "version": "3.0.0",
+        "deploy_profile": settings.deploy_profile,
         "docs": "/docs",
         "health": "/api/v1/health",
+        "plugins": "/api/v1/plugins",
     }
 
 

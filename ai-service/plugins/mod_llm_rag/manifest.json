@@ -1,0 +1,16 @@
+{
+  "plugin_id": "mod-llm-rag",
+  "name": "DeepSeek / Qwen 安全大脑与法规 RAG 插件",
+  "layer": "安全大脑与知识推理层 (LLM + pgvector RAG)",
+  "order": 6,
+  "description": "结合 PostgreSQL pgvector 混合检索与 Q4_K_M / 远端推理大模型，自动解读 Dow/LEC/TNT/SCL 计算结论、溯源国标条款并推演应急处置卡。",
+  "uv_extra": "llm-rag",
+  "requires_gpu": false,
+  "default_enabled": true,
+  "min_ram_mb": 90,
+  "supported_precisions": ["q4_k_m", "int8", "remote_api"],
+  "default_precision_cpu": "int8",
+  "required_imports": ["httpx", "psycopg"],
+  "fallback_behavior": "停用或离线时，报告生成切换至「国家注册安全工程师标准确定性 Markdown 模板」，检索切换至本地词法与特征向量混合检索引擎。",
+  "entrypoint": "plugins.mod_llm_rag.plugin:LlmRagPlugin"
+}

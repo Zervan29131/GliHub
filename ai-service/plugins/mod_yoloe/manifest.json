@@ -1,0 +1,16 @@
+{
+  "plugin_id": "mod-yoloe",
+  "name": "Ultralytics YOLOE 开放词汇零样本检测插件",
+  "layer": "开放词汇检测层 (Open-Vocabulary Zero-Shot)",
+  "order": 4,
+  "description": "支持输入中文/英文临时排查词（如“未盖盖子的化学品桶”“堵塞消防通道杂物”“未佩戴安全帽”）无需重训即时检出新隐患。",
+  "uv_extra": "yoloe",
+  "requires_gpu": false,
+  "default_enabled": true,
+  "min_ram_mb": 220,
+  "supported_precisions": ["int8", "fp16"],
+  "default_precision_cpu": "int8",
+  "required_imports": ["onnxruntime", "cv2"],
+  "fallback_behavior": "未选装原生 YOLOE CLIP 编码器时，自动启用双语工业 EHS 语义词典映射 + INT8 视觉定位与 VLM 复核。",
+  "entrypoint": "plugins.mod_yoloe.plugin:YoloEPlugin"
+}

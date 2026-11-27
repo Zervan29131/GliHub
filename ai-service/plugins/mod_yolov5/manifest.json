@@ -1,0 +1,16 @@
+{
+  "plugin_id": "mod-yolov5",
+  "name": "存量 YOLOv5 安全帽检测插件",
+  "layer": "兼容存量层 (Legacy Vision)",
+  "order": 1,
+  "description": "无缝继承 yolov5target-main 已训练安全帽权重 (best.pt -> yolov5_helmet.int8.onnx)，结合人帽头部空间耦合实现高精度未戴安全帽识别。",
+  "uv_extra": "yolov5",
+  "requires_gpu": false,
+  "default_enabled": true,
+  "min_ram_mb": 180,
+  "supported_precisions": ["int8", "fp16", "fp32"],
+  "default_precision_cpu": "int8",
+  "required_imports": ["onnxruntime", "cv2"],
+  "fallback_behavior": "未选装时中心视觉入口提示安装命令，可由边缘节点 edge-yolo26 独立接管现场抓拍。",
+  "entrypoint": "plugins.mod_yolov5.plugin:YoloV5Plugin"
+}

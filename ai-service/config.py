@@ -1,8 +1,29 @@
+from __future__ import annotations
+
+import os
 from pathlib import Path
 from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent
+GLIHUB_ROOT = BASE_DIR.parent
+
+
+def _discover_yolov5_dir() -> str:
+    env_val = os.getenv("YOLOV5_REPO_DIR")
+    candidates = []
+    if env_val:
+        candidates.append(Path(env_val))
+    candidates.extend(
+        [
+            GLIHUB_ROOT / "yolov5target-main",
+            GLIHUB_ROOT.parent / "yolov5target-main",
+        ]
+    )
+    for c in candidates:
+        if c.exists():
+            return str(c.resolve())
+    return str((GLIHUB_ROOT.parent / "yolov5target-main").resolve())
 
 
 class Settings(BaseSettings):
@@ -14,15 +35,20 @@ class Settings(BaseSettings):
 
     ai_service_host: str = "0.0.0.0"
     ai_service_port: int = 8090
-    default_device: str = "auto"
 
-    yolov5_repo_dir: str = str((BASE_DIR.parent / "yolov5target-main").resolve())
+    # GliHub 3.0 Low-Precision & Profile controls
+    deploy_profile: str = "cpu-int8"  # cpu-int8 | local-q4 | gpu-pro
+    default_precision: str = "int8"   # int8 | fp16 | fp32 | auto
+    default_device: str = "auto"
+    default_imgsz: int = 640
+    cpu_threads: int = 0
+    disable_all_plugins: bool = False
+
+    data_dir: str = str((GLIHUB_ROOT / "data").resolve())
+    models_dir: str = str((GLIHUB_ROOT / "data" / "models").resolve())
+    yolov5_repo_dir: str = _discover_yolov5_dir()
     output_dir: str = str((BASE_DIR / "outputs").resolve())
     yolov5_coupled_person_check: bool = True
-
-    enable_yolo26: bool = True
-    enable_rfdetr: bool = False
-    enable_yoloe: bool = True
 
     db_host: str = "localhost"
     db_port: int = 5432
@@ -32,7 +58,7 @@ class Settings(BaseSettings):
 
     vlm_base_url: str = "http://localhost:11434/v1"
     vlm_api_key: str = ""
-    vlm_model: str = "qwen2.5vl:7b"
+    vlm_model: str = "qwen3-vl:4b"
     vlm_timeout_sec: float = 25.0
 
     llm_base_url: str = "http://localhost:11434/v1"
@@ -60,13 +86,24 @@ class Settings(BaseSettings):
         if not p:
             return None
         path = Path(p)
-        if path.is_absolute():
+        if path.is_absolute() and path.exists():
             return path
-        candidate_from_service = (BASE_DIR / path).resolve()
-        if candidate_from_service.exists():
-            return candidate_from_service
-        return (BASE_DIR.parent / path).resolve()
+        # Search across ai-service/, GliHub root, data/, and sibling yolov5target-main!
+        search_bases = [BASE_DIR, GLIHUB_ROOT, Path(self.data_dir), GLIHUB_ROOT.parent]
+        for base in search_bases:
+            cand = (base / p).resolve()
+            if cand.exists():
+                return cand
+        # If caller passed `yolov5target-main/foo/bar.jpg` while repo lives at discovered `yolov5_repo_dir`
+        norm_str = str(p).replace("\\", "/")
+        if "yolov5target-main/" in norm_str:
+            sub_rel = norm_str.split("yolov5target-main/", 1)[1]
+            cand_v5 = (Path(self.yolov5_repo_dir) / sub_rel).resolve()
+            if cand_v5.exists():
+                return cand_v5
+        return (GLIHUB_ROOT / path).resolve()
 
 
 settings = Settings()
 Path(settings.output_dir).mkdir(parents=True, exist_ok=True)
+Path(settings.models_dir).mkdir(parents=True, exist_ok=True)

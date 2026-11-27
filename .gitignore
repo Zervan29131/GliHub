@@ -32,6 +32,9 @@ venv/
 ai-service/.env
 ai-service/outputs/
 yolov5target-main/**/*.partial
+data/
+edge-yolo26/config.yaml
+edge-yolo26/edge_data/
 
 # IDEs & Editors
 .idea/

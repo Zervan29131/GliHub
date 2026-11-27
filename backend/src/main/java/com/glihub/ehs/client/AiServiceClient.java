@@ -73,6 +73,28 @@ public class AiServiceClient
         }
     }
 
+    public JSONObject getJsonWithFallback(String apiPath, JSONObject fallback)
+    {
+        if (!isAiEnabled())
+        {
+            return fallback;
+        }
+        try
+        {
+            String url = GliHubConfig.getAiServiceUrl() + apiPath;
+            String body = buildTemplate(5000).getForObject(url, String.class);
+            if (body != null)
+            {
+                return JSON.parseObject(body);
+            }
+        }
+        catch (Exception ex)
+        {
+            log.warn("GET ai-service [{}] 触发降级: {}", apiPath, ex.getMessage());
+        }
+        return fallback;
+    }
+
     public JSONObject postJsonWithFallback(String apiPath, Map<String, Object> payload, JSONObject fallback)
     {
         if (!isAiEnabled())

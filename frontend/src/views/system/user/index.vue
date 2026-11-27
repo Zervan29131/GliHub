@@ -2,14 +2,14 @@
    <div class="app-container">
       <el-row :gutter="20">
          <!--作业区数据-->
-         <!-- <el-col :span="4" :xs="24">
+         <el-col :span="4" :xs="24">
             <div class="head-container">
                <el-input
                   v-model="deptName"
-                  placeholder="请输入作业区名称"
+                  placeholder="筛选作业区"
                   clearable
                   prefix-icon="Search"
-                  style="margin-bottom: 20px"
+                  style="margin-bottom: 16px"
                />
             </div>
             <div class="head-container">
@@ -24,7 +24,7 @@
                   @node-click="handleNodeClick"
                />
             </div>
-         </el-col> -->
+         </el-col>
          <!--用户数据-->
          <el-col :span="20" :xs="24">
             <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
@@ -101,19 +101,19 @@
                <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
                   <template #default="scope">
                      <el-tooltip content="修改" placement="top" v-if="scope.row.userId !== 1">
-                        <el-button type="text" icon="Edit" @click="handleUpdate(scope.row)"
+                        <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
                            v-hasPermi="['system:user:edit']"></el-button>
                      </el-tooltip>
                      <el-tooltip content="删除" placement="top" v-if="scope.row.userId !== 1">
-                        <el-button type="text" icon="Delete" @click="handleDelete(scope.row)"
+                        <el-button link type="danger" icon="Delete" @click="handleDelete(scope.row)"
                            v-hasPermi="['system:user:remove']"></el-button>
                      </el-tooltip>
                      <el-tooltip content="重置密码" placement="top" v-if="scope.row.userId !== 1">
-                        <el-button type="text" icon="Key" @click="handleResetPwd(scope.row)"
+                        <el-button link type="primary" icon="Key" @click="handleResetPwd(scope.row)"
                            v-hasPermi="['system:user:resetPwd']"></el-button>
                      </el-tooltip>
                      <el-tooltip content="分配角色" placement="top" v-if="scope.row.userId !== 1">
-                        <el-button type="text" icon="CircleCheck" @click="handleAuthRole(scope.row)"
+                        <el-button link type="primary" icon="CircleCheck" @click="handleAuthRole(scope.row)"
                            v-hasPermi="['system:user:edit']"></el-button>
                      </el-tooltip>
                   </template>
@@ -178,8 +178,7 @@
                <el-col :span="12">
                   <el-form-item label="状态">
                      <el-radio-group v-model="form.status">
-                        <el-radio v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.value">{{ dict.label
-                           }}</el-radio>
+                        <el-radio v-for="dict in sys_normal_disable" :key="dict.value" :value="dict.value">{{ dict.label }}</el-radio>
                      </el-radio-group>
                   </el-form-item>
                </el-col>
@@ -324,7 +323,7 @@ const filterNode = (value, data) => {
 };
 /** 根据名称筛选作业区树 */
 watch(deptName, val => {
-   proxy.$refs["deptTreeRef"].filter(val);
+   proxy.$refs["deptTreeRef"]?.filter(val);
 });
 /** 查询作业区下拉树结构 */
 function getTreeselect() {
@@ -505,7 +504,7 @@ function handleUpdate(row) {
       form.value.roleIds = response.roleIds;
       open.value = true;
       title.value = "修改用户";
-      form.password = "";
+      form.value.password = "";
    });
 };
 /** 提交按钮 */

@@ -1,6 +1,6 @@
 <template>
   <div :class="classObj" class="app-wrapper" :style="{ '--current-color': theme }">
-    <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
+    <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
     <sidebar v-if="!sidebar.hide" class="sidebar-container" />
     <div :class="{ hasTagsView: needTagsView, sidebarHide: sidebar.hide }" class="main-container">
       <div :class="{ 'fixed-header': fixedHeader }">
@@ -19,18 +19,19 @@ import { useWindowSize } from '@vueuse/core'
 import Sidebar from './components/Sidebar/index.vue'
 import { AppMain, Navbar, Settings, TagsView } from './components'
 import EhsAiCopilot from '@/components/EhsAiCopilot/index.vue'
-import defaultSettings from '@/settings'
 
 import useAppStore from '@/store/modules/app'
 import useSettingsStore from '@/store/modules/settings'
 
+const route = useRoute()
+const appStore = useAppStore()
 const settingsStore = useSettingsStore()
-const theme = computed(() => settingsStore.theme);
-const sideTheme = computed(() => settingsStore.sideTheme);
-const sidebar = computed(() => useAppStore().sidebar);
-const device = computed(() => useAppStore().device);
-const needTagsView = computed(() => settingsStore.tagsView);
-const fixedHeader = computed(() => settingsStore.fixedHeader);
+
+const theme = computed(() => settingsStore.theme)
+const sidebar = computed(() => appStore.sidebar)
+const device = computed(() => appStore.device)
+const needTagsView = computed(() => settingsStore.tagsView)
+const fixedHeader = computed(() => settingsStore.fixedHeader)
 
 const classObj = computed(() => ({
   hideSidebar: !sidebar.value.opened,
@@ -39,34 +40,48 @@ const classObj = computed(() => ({
   mobile: device.value === 'mobile'
 }))
 
-const { width, height } = useWindowSize();
-const WIDTH = 992; // refer to Bootstrap's responsive design
+const { width } = useWindowSize()
+const WIDTH = 992
 
-watchEffect(() => {
-  if (device.value === 'mobile' && sidebar.value.opened) {
-    useAppStore().closeSideBar({ withoutAnimation: false })
+// 仅在窗口宽度跨越断点时切换桌面/移动端模式，避免点击展开菜单时被反向立即关闭
+watch(
+  width,
+  (val) => {
+    if (val - 1 < WIDTH) {
+      if (device.value !== 'mobile') {
+        appStore.toggleDevice('mobile')
+        appStore.closeSideBar(true)
+      }
+    } else if (device.value !== 'desktop') {
+      appStore.toggleDevice('desktop')
+    }
+  },
+  { immediate: true }
+)
+
+// 移动端模式下点击菜单完成路由跳转后自动收起侧边抽屉
+watch(
+  () => route.path,
+  () => {
+    if (device.value === 'mobile' && sidebar.value.opened) {
+      appStore.closeSideBar(false)
+    }
   }
-  if (width.value - 1 < WIDTH) {
-    useAppStore().toggleDevice('mobile')
-    useAppStore().closeSideBar({ withoutAnimation: true })
-  } else {
-    useAppStore().toggleDevice('desktop')
-  }
-})
+)
 
 function handleClickOutside() {
-  useAppStore().closeSideBar({ withoutAnimation: false })
+  appStore.closeSideBar(false)
 }
 
-const settingRef = ref(null);
+const settingRef = ref(null)
 function setLayout() {
-  settingRef.value.openSetting();
+  settingRef.value?.openSetting()
 }
 </script>
 
 <style lang="scss" scoped>
-  @import "@/assets/styles/mixin.scss";
-  @import "@/assets/styles/variables.module.scss";
+@import "@/assets/styles/mixin.scss";
+@import "@/assets/styles/variables.module.scss";
 
 .app-wrapper {
   @include clearfix;
@@ -86,7 +101,7 @@ function setLayout() {
   width: 100%;
   top: 0;
   height: 100%;
-  position: absolute;
+  position: fixed;
   z-index: 999;
 }
 

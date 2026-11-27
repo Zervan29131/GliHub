@@ -1,4 +1,4 @@
-// cover some element-ui styles
+// Element Plus 2.14 global style adaptations
 
 .el-breadcrumb__inner,
 .el-breadcrumb__inner a {
@@ -29,9 +29,8 @@
 }
 
 .fixed-width {
-  .el-button--mini {
-    padding: 7px 10px;
-    width: 60px;
+  .el-button--small {
+    padding: 5px 8px;
   }
 }
 
@@ -46,7 +45,16 @@
   }
 }
 
-// to fixed https://github.com/ElemeFE/element/issues/2461
+// Element Plus 2.5+ inline form el-select default width fix
+.el-form--inline {
+  .el-select {
+    min-width: 170px;
+  }
+  .el-input {
+    min-width: 170px;
+  }
+}
+
 .el-dialog {
   transform: none;
   left: 0;
@@ -54,7 +62,6 @@
   margin: 0 auto;
 }
 
-// refine element ui upload
 .upload-container {
   .el-upload {
     width: 100%;
@@ -66,31 +73,28 @@
   }
 }
 
-// dropdown
 .el-dropdown-menu {
   a {
-    display: block
+    display: block;
   }
 }
 
-// fix date-picker ui bug in filter-item
 .el-range-editor.el-input__inner {
   display: inline-flex !important;
 }
 
-// to fix el-date-picker css style
 .el-range-separator {
   box-sizing: content-box;
 }
 
 .el-menu--collapse
   > div
-  > .el-submenu
-  > .el-submenu__title
-  .el-submenu__icon-arrow {
+  > .el-sub-menu
+  > .el-sub-menu__title
+  .el-sub-menu__icon-arrow {
   display: none;
 }
 
-.el-dropdown .el-dropdown-link{
+.el-dropdown .el-dropdown-link {
   color: var(--el-color-primary) !important;
 }

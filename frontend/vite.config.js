@@ -2,7 +2,6 @@ import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
 import createVitePlugins from './vite/plugins'
 
-// Vite 构建与开发代理配置
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd())
   const { VITE_APP_ENV } = env
@@ -17,12 +16,12 @@ export default defineConfig(({ mode, command }) => {
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
     },
     server: {
-      port: 80,
+      port: 5173,
       host: true,
-      open: true,
+      open: false,
       proxy: {
         '/dev-api': {
-          target: env.VITE_PROXY_TARGET || 'http://localhost:8080',
+          target: env.VITE_PROXY_TARGET || 'http://localhost:8081',
           changeOrigin: true,
           ws: true,
           rewrite: (p) => p.replace(/^\/dev-api/, '')
@@ -30,6 +29,12 @@ export default defineConfig(({ mode, command }) => {
       }
     },
     css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+          silenceDeprecations: ['import', 'global-builtin', 'color-functions']
+        }
+      },
       postcss: {
         plugins: [
           {
@@ -37,7 +42,7 @@ export default defineConfig(({ mode, command }) => {
             AtRule: {
               charset: (atRule) => {
                 if (atRule.name === 'charset') {
-                  atRule.remove();
+                  atRule.remove()
                 }
               }
             }

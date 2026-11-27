@@ -1,0 +1,16 @@
+{
+  "plugin_id": "mod-ocr",
+  "name": "DeepSeek-OCR 2 / PP-OCR 法规与票证解析插件",
+  "layer": "法规与票证解析层 (Document & SDS OCR)",
+  "order": 7,
+  "description": "结构化解析《安全生产法》、GB 18218、特种设备检验报告与危化品 SDS 安全技术说明书，无卡环境自动回退轻量 ONNX / 原生 PDF 解析。",
+  "uv_extra": "ocr",
+  "requires_gpu": false,
+  "default_enabled": true,
+  "min_ram_mb": 120,
+  "supported_precisions": ["int8", "remote_api"],
+  "default_precision_cpu": "int8",
+  "required_imports": ["pypdf"],
+  "fallback_behavior": "未配置 VL-OCR 端点时自动回退本地轻量 PP-OCR INT8 / pypdf 结构化条款切分器。",
+  "entrypoint": "plugins.mod_ocr.plugin:OcrDocumentPlugin"
+}

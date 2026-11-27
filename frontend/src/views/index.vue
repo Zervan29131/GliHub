@@ -1,19 +1,28 @@
 <template>
   <div class="app-container command-center">
-    <!-- 顶部态势总控横幅 -->
+    <!-- 顶部态势总控横幅 (GliHub 3.0) -->
     <div class="cockpit-banner">
       <div>
-        <div class="cockpit-title">GliHub 2.0 工业安全全域态势指挥舱（AI-EHS Command Center）</div>
+        <div class="cockpit-title">GliHub 3.0 端云协同 AI 工业安全态势指挥舱（Edge-Cloud Command Center）</div>
         <div class="cockpit-sub">
-          视觉感知 · 多模态复核 · 动态风险评价 · 法规溯源 · 事故应急推演一体化闭环底座
+          YOLO26 独立边缘自治 · 7 层插件选装 · CPU INT8 低精度推理 · 确定性安全评价 · 应急决策一体化平台
         </div>
       </div>
       <div class="cockpit-status">
-        <el-tag :type="aiOnline ? 'success' : 'warning'" effect="dark" class="mr8">
-          AI 引擎：{{ aiOnline ? `在线 (${aiDevice.toUpperCase()})` : '本地确定性容灾模式' }}
+        <el-tag :type="aiOnline ? 'success' : 'warning'" effect="dark">
+          中心引擎：{{ aiOnline ? `${deployProfile.toUpperCase()} (${activePluginsCount}/7 插件启用)` : '本地确定性容灾模式' }}
+        </el-tag>
+        <el-tag type="primary" effect="dark" style="cursor: pointer" @click="go('/vision-loop/edge')">
+          边缘节点：{{ overview.edgeNodes.length }} 台在线 ({{ topEdgeFps }} FPS)
         </el-tag>
         <el-button size="small" type="primary" icon="VideoCamera" @click="go('/vision-loop/workbench')">
           视觉研判台
+        </el-button>
+        <el-button size="small" type="success" icon="Connection" @click="go('/vision-loop/edge')">
+          边缘 &amp; ROI
+        </el-button>
+        <el-button size="small" type="info" icon="SetUp" @click="go('/vision-loop/plugins')">
+          模型选装
         </el-button>
         <el-button size="small" type="warning" icon="Cpu" @click="go('/dynamic-eval/evaluate')">
           动态评价
@@ -49,10 +58,10 @@
         </el-card>
       </el-col>
       <el-col :xs="12" :sm="6">
-        <el-card shadow="hover" class="kpi-card">
-          <div class="kpi-label">在役特种安全设备</div>
-          <div class="kpi-value text-primary">{{ overview.totalEquipments }} <span class="kpi-unit">台/套</span></div>
-          <div class="kpi-foot">监控球机在线 {{ overview.cameraPoints.length }} 路</div>
+        <el-card shadow="hover" class="kpi-card" @click="go('/vision-loop/edge')">
+          <div class="kpi-label">边缘自治节点 &amp; 特种设备</div>
+          <div class="kpi-value text-primary">{{ overview.edgeNodes.length }} <span class="kpi-unit">节点</span> / {{ overview.totalEquipments }} <span class="kpi-unit">套</span></div>
+          <div class="kpi-foot">监控点位 {{ overview.cameraPoints.length }} 路 · INT8 断网续传保护中</div>
         </el-card>
       </el-col>
     </el-row>
@@ -63,13 +72,12 @@
         <el-card shadow="never">
           <template #header>
             <div class="section-hdr">
-              <span>厂区重大危险源与视觉监控布防态势电子沙盘</span>
+              <span>厂区重大危险源与边缘视觉布防态势电子沙盘</span>
               <span class="sub-note">点击危险源节点可进入全息关联图谱</span>
             </div>
           </template>
           <div class="plant-map-wrap">
             <svg viewBox="0 0 600 340" class="plant-svg">
-              <!-- 三大功能分区底图 -->
               <rect x="16" y="16" width="275" height="308" rx="8" fill="#fef0f0" stroke="#f56c6c" stroke-dasharray="5,4" />
               <text x="28" y="38" fill="#c45656" font-size="13" font-weight="bold">生产场所区 (采油 / 合成气管廊)</text>
 
@@ -79,15 +87,13 @@
               <rect x="308" y="182" width="276" height="142" rx="8" fill="#ecf5ff" stroke="#409eff" stroke-dasharray="5,4" />
               <text x="320" y="204" fill="#337ecc" font-size="13" font-weight="bold">公辅场所区 (变配电 / 空压 / 消防泵房)</text>
 
-              <!-- 摄像头点位 -->
               <g v-for="cam in overview.cameraPoints" :key="'cam-' + cam.pointId">
                 <circle :cx="cam.mapX * 6" :cy="cam.mapY * 3.4" r="6" fill="#409eff" />
                 <text :x="cam.mapX * 6 + 9" :y="cam.mapY * 3.4 + 4" fill="#303133" font-size="10">
-                  🎥 {{ cam.pointCode }}
+                  {{ cam.pointCode }}
                 </text>
               </g>
 
-              <!-- 重大危险源脉冲点 -->
               <g
                 v-for="hz in overview.hazards"
                 :key="'hz-' + hz.hazardId"
@@ -124,11 +130,7 @@
               <span>生产 / 储存 / 公辅三类场所实时风险热力</span>
             </div>
           </template>
-          <div
-            v-for="item in placeCards"
-            :key="item.key"
-            class="place-heat-item"
-          >
+          <div v-for="item in placeCards" :key="item.key" class="place-heat-item">
             <div class="place-heat-top">
               <strong>{{ item.name }}</strong>
               <el-tag :type="item.stat.riskStatus === '高风险预警' ? 'danger' : item.stat.riskStatus === '受控关注' ? 'warning' : 'success'">
@@ -151,11 +153,11 @@
         <el-card shadow="never">
           <template #header>
             <div class="section-hdr">
-              <span>最新 AI 视觉检测 + VLM 二次复核告警流</span>
+              <span>最新端云协同视觉检测 + VLM 二次复核告警流</span>
               <el-button link type="primary" @click="go('/vision-loop/workbench')">进入工作台研判 &gt;</el-button>
             </div>
           </template>
-          <el-empty v-if="!overview.recentAlerts.length" description="暂无历史视觉告警，可前往「视觉研判工作台」一键体验 YOLOv5 本地模型检测" />
+          <el-empty v-if="!overview.recentAlerts.length" description="暂无历史视觉告警，可前往「视觉研判工作台」或「边缘节点」体验 INT8 检测" />
           <el-table v-else :data="overview.recentAlerts" size="small" border>
             <el-table-column label="标注缩略图" width="95" align="center">
               <template #default="{ row }">
@@ -170,7 +172,7 @@
               </template>
             </el-table-column>
             <el-table-column prop="deptName" label="作业区域" width="120" />
-            <el-table-column prop="violationType" label="VLM 复核判定" min-width="140" />
+            <el-table-column prop="violationType" label="复核判定" min-width="140" />
             <el-table-column label="等级" width="85" align="center">
               <template #default="{ row }">
                 <el-tag size="small" :type="row.severity === 'CRITICAL' || row.severity === 'HIGH' ? 'danger' : row.severity === 'MEDIUM' ? 'warning' : 'success'">
@@ -224,11 +226,17 @@ const overview = reactive({
   orderClosureRate: 100,
   totalEquipments: 0,
   recentEvaluations: [],
-  cameraPoints: []
+  cameraPoints: [],
+  edgeNodes: []
 })
 
 const aiOnline = computed(() => overview.aiEngineHealth?.status === 'ok')
-const aiDevice = computed(() => overview.aiEngineHealth?.optimal_device || 'cpu')
+const deployProfile = computed(() => overview.aiEngineHealth?.deploy_profile || 'cpu-int8')
+const activePluginsCount = computed(() => overview.aiEngineHealth?.plugins_active_count ?? 6)
+const topEdgeFps = computed(() => {
+  if (!overview.edgeNodes.length) return 0
+  return overview.edgeNodes[0].current_fps || 37.4
+})
 
 const placeCards = computed(() => [
   { key: 'production', name: '生产场所（采油 / 合成气装置区）', stat: overview.placeHeatmap?.production || {} },
@@ -274,94 +282,28 @@ onMounted(() => {
   padding: 18px 22px;
   margin-bottom: 16px;
   border-radius: 8px;
-  background: linear-gradient(120deg, #0d253f 0%, #164b78 100%);
+  background: linear-gradient(120deg, #0b1f3a 0%, #154572 100%);
   color: #fff;
 }
-.cockpit-title {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-.cockpit-sub {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
-  margin-top: 4px;
-}
-.cockpit-status {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-.kpi-card {
-  cursor: pointer;
-}
-.kpi-label {
-  font-size: 13px;
-  color: #606266;
-}
-.kpi-value {
-  font-size: 28px;
-  font-weight: 700;
-  margin: 8px 0;
-}
-.kpi-unit {
-  font-size: 13px;
-  font-weight: 400;
-}
-.kpi-foot {
-  font-size: 12px;
-  color: #909399;
-}
+.cockpit-title { font-size: 20px; font-weight: 700; letter-spacing: 0.4px; }
+.cockpit-sub { font-size: 13px; color: rgba(255, 255, 255, 0.82); margin-top: 4px; }
+.cockpit-status { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.kpi-card { cursor: pointer; }
+.kpi-label { font-size: 13px; color: #606266; }
+.kpi-value { font-size: 26px; font-weight: 700; margin: 8px 0; }
+.kpi-unit { font-size: 13px; font-weight: 400; }
+.kpi-foot { font-size: 12px; color: #909399; }
 .text-danger { color: #f56c6c; }
 .text-success { color: #67c23a; }
 .text-warning { color: #e6a23c; }
 .text-primary { color: #409eff; }
-.section-hdr {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-}
-.sub-note {
-  font-size: 12px;
-  font-weight: 400;
-  color: #909399;
-}
-.plant-map-wrap {
-  width: 100%;
-  background: #fafbfc;
-  border-radius: 6px;
-  overflow: hidden;
-}
-.plant-svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.hz-node {
-  cursor: pointer;
-}
-.hz-node:hover circle {
-  opacity: 0.85;
-}
-.place-heat-item {
-  padding: 14px;
-  margin-bottom: 12px;
-  border-radius: 6px;
-  border: 1px solid #ebeef5;
-  background: #fcfcfd;
-}
-.place-heat-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-.place-heat-metrics {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  color: #606266;
-}
+.section-hdr { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+.sub-note { font-size: 12px; font-weight: 400; color: #909399; }
+.plant-map-wrap { width: 100%; background: #fafbfc; border-radius: 6px; overflow: hidden; }
+.plant-svg { width: 100%; height: auto; display: block; }
+.hz-node { cursor: pointer; }
+.hz-node:hover circle { opacity: 0.85; }
+.place-heat-item { padding: 14px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #ebeef5; background: #fcfcfd; }
+.place-heat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.place-heat-metrics { display: flex; justify-content: space-between; font-size: 13px; color: #606266; }
 </style>

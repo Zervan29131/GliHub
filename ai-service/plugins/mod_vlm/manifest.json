@@ -1,0 +1,16 @@
+{
+  "plugin_id": "mod-vlm",
+  "name": "Qwen3-VL / InternVL3 视觉多模态复核插件",
+  "layer": "视觉多模态复核层 (VLM Secondary Review)",
+  "order": 5,
+  "description": "串联 YOLO 候选框做二次防误报研判（支持本地 Ollama/llama.cpp GGUF Q4_K_M 或远端 OpenAI 兼容多模态 API），自动生成隐患描述与整改建议。",
+  "uv_extra": "vlm",
+  "requires_gpu": false,
+  "default_enabled": true,
+  "min_ram_mb": 40,
+  "supported_precisions": ["q4_k_m", "fp16", "remote_api"],
+  "default_precision_cpu": "q4_k_m",
+  "required_imports": ["httpx"],
+  "fallback_behavior": "未连接 VLM 端点或停用插件时，自动切换至内置「工业 EHS 确定性违章定级规则器」保障工单闭环。",
+  "entrypoint": "plugins.mod_vlm.plugin:VlmReviewPlugin"
+}

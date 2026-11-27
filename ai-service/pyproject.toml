@@ -1,0 +1,69 @@
+[project]
+name = "glihub-ai-service"
+version = "3.0.0"
+description = "GliHub 3.0 Modular 7-Plugin Low-Precision AI-EHS Center Service"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+    "python-multipart>=0.0.12",
+    "psycopg[binary]>=3.2.0",
+    "pypdf>=5.0.0",
+    "psutil>=6.0.0",
+    "numpy>=1.26.0",
+    "pillow>=10.4.0",
+]
+
+[project.optional-dependencies]
+# === 7 Modular Optional AI Plugins (Install on demand via `uv sync --extra <name>`) ===
+yolov5 = [
+    "onnxruntime>=1.19.0",
+    "opencv-python-headless>=4.10.0",
+]
+yolo26 = [
+    "onnxruntime>=1.19.0",
+    "opencv-python-headless>=4.10.0",
+]
+rfdetr = [
+    "onnxruntime>=1.19.0",
+    "opencv-python-headless>=4.10.0",
+    "rfdetr>=1.0.0",
+]
+yoloe = [
+    "onnxruntime>=1.19.0",
+    "opencv-python-headless>=4.10.0",
+    "ultralytics>=8.4.0",
+]
+vlm = [
+    "httpx>=0.27.0",
+]
+llm-rag = [
+    "onnxruntime>=1.19.0",
+    "httpx>=0.27.0",
+]
+ocr = [
+    "onnxruntime>=1.19.0",
+    "opencv-python-headless>=4.10.0",
+]
+
+# === 3 Hardware Deployment Tier Presets ===
+cpu-int8 = [
+    "onnxruntime>=1.19.0",
+    "opencv-python-headless>=4.10.0",
+]
+local-q4 = [
+    "onnxruntime>=1.19.0",
+    "opencv-python-headless>=4.10.0",
+    "ultralytics>=8.4.0",
+]
+export = [
+    "ultralytics>=8.4.0",
+    "onnx>=1.16.0",
+    "onnxslim>=0.1.36",
+]
+
+[tool.uv]
+package = false

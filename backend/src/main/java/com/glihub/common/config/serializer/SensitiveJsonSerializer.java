@@ -1,31 +1,24 @@
 package com.glihub.common.config.serializer;
 
-import java.io.IOException;
 import java.util.Objects;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.ContextualSerializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.BeanProperty;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 import com.glihub.common.annotation.Sensitive;
 import com.glihub.common.core.domain.model.LoginUser;
 import com.glihub.common.enums.DesensitizedType;
 import com.glihub.common.utils.SecurityUtils;
 
-/**
- * 数据脱敏序列化过滤
- *
- * @author glihub
- */
-public class SensitiveJsonSerializer extends JsonSerializer<String> implements ContextualSerializer
+public class SensitiveJsonSerializer extends ValueSerializer<String>
 {
     private DesensitizedType desensitizedType;
 
     @Override
-    public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException
+    public void serialize(String value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException
     {
-        if (desensitization())
+        if (desensitization() && desensitizedType != null)
         {
             gen.writeString(desensitizedType.desensitizer().apply(value));
         }
@@ -36,27 +29,27 @@ public class SensitiveJsonSerializer extends JsonSerializer<String> implements C
     }
 
     @Override
-    public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property)
-            throws JsonMappingException
+    public ValueSerializer<?> createContextual(SerializationContext ctxt, BeanProperty property)
     {
-        Sensitive annotation = property.getAnnotation(Sensitive.class);
-        if (Objects.nonNull(annotation) && Objects.equals(String.class, property.getType().getRawClass()))
+        if (property != null)
         {
-            this.desensitizedType = annotation.desensitizedType();
-            return this;
+            Sensitive annotation = property.getAnnotation(Sensitive.class);
+            if (Objects.nonNull(annotation) && Objects.equals(String.class, property.getType().getRawClass()))
+            {
+                SensitiveJsonSerializer custom = new SensitiveJsonSerializer();
+                custom.desensitizedType = annotation.desensitizedType();
+                return custom;
+            }
+            return ctxt.findValueSerializer(property.getType());
         }
-        return prov.findValueSerializer(property.getType(), property);
+        return this;
     }
 
-    /**
-     * 是否需要脱敏处理
-     */
     private boolean desensitization()
     {
         try
         {
             LoginUser securityUser = SecurityUtils.getLoginUser();
-            // 管理员不脱敏
             return !securityUser.getUser().isAdmin();
         }
         catch (Exception e)

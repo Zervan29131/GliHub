@@ -9,7 +9,7 @@
       </app-link>
     </template>
 
-    <el-sub-menu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
+    <el-sub-menu v-else ref="subMenu" :index="resolvePath(item.path)" :teleported="true">
       <template v-if="item.meta" #title>
         <svg-icon :icon-class="item.meta && item.meta.icon" />
         <span class="menu-title" :title="hasTitle(item.meta.title)">{{ item.meta.title }}</span>
@@ -93,7 +93,7 @@ function resolvePath(routePath, routeQuery) {
 }
 
 function hasTitle(title){
-  if (title.length > 5) {
+  if (title && title.length > 5) {
     return title;
   } else {
     return "";

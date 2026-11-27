@@ -126,13 +126,17 @@
          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template #default="scope">
                <el-button
-                  type="text"
+                  link
+                  type="primary"
+                  size="small"
                   icon="Edit"
                   @click="handleUpdate(scope.row)"
                   v-hasPermi="['system:dict:edit']"
                >修改</el-button>
                <el-button
-                  type="text"
+                  link
+                  type="danger"
+                  size="small"
                   icon="Delete"
                   @click="handleDelete(scope.row)"
                   v-hasPermi="['system:dict:remove']"
@@ -163,7 +167,7 @@
                   <el-radio
                      v-for="dict in sys_normal_disable"
                      :key="dict.value"
-                     :label="dict.value"
+                     :value="dict.value"
                   >{{ dict.label }}</el-radio>
                </el-radio-group>
             </el-form-item>

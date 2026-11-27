@@ -147,11 +147,11 @@ export function download(url, params, filename) {
       const errMsg = errorCode[rspObj.code] || rspObj.msg || errorCode['default']
       ElMessage.error(errMsg);
     }
-    downloadLoadingInstance.close();
+    if (downloadLoadingInstance) downloadLoadingInstance.close();
   }).catch((r) => {
     console.error(r)
     ElMessage.error('下载文件出现错误，请联系管理员！')
-    downloadLoadingInstance.close();
+    if (downloadLoadingInstance) downloadLoadingInstance.close();
   })
 }
 

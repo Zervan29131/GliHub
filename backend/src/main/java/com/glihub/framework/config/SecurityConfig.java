@@ -2,16 +2,19 @@ package com.glihub.framework.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.filter.CorsFilter;
@@ -20,13 +23,9 @@ import com.glihub.framework.security.filter.JwtAuthenticationTokenFilter;
 import com.glihub.framework.security.handle.AuthenticationEntryPointImpl;
 import com.glihub.framework.security.handle.LogoutSuccessHandlerImpl;
 
-/**
- * Spring Security 安全鉴权配置
- *
- * @author glihub
- */
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter
+@Configuration
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
+public class SecurityConfig
 {
     @Autowired
     private UserDetailsService userDetailsService;
@@ -47,44 +46,65 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     private PermitAllUrlProperties permitAllUrl;
 
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception
-    {
-        return super.authenticationManagerBean();
-    }
-
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception
-    {
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity.authorizeRequests();
-        permitAllUrl.getUrls().forEach(url -> registry.antMatchers(url).permitAll());
-
-        httpSecurity
-                .csrf().disable()
-                .headers().cacheControl().disable().and()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests()
-                .antMatchers("/login", "/captchaImage", "/ws/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**", "/ai-outputs/**", "/sample-images/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .headers().frameOptions().disable();
-        httpSecurity.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);
-        httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-        httpSecurity.addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class);
-        httpSecurity.addFilterBefore(corsFilter, LogoutFilter.class);
-    }
-
-    @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder()
     {
         return new BCryptPasswordEncoder();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception
+    @Bean
+    public AuthenticationManager authenticationManager()
     {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+        provider.setPasswordEncoder(bCryptPasswordEncoder());
+        return new ProviderManager(provider);
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception
+    {
+        http
+            .csrf(AbstractHttpConfigurer::disable)
+            .headers(headers -> headers
+                .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> {
+                for (String url : permitAllUrl.getUrls())
+                {
+                    auth.requestMatchers(url).permitAll();
+                }
+                auth.requestMatchers(
+                        "/login",
+                        "/register",
+                        "/captchaImage",
+                        "/ws/**",
+                        "/ehs/edge/register",
+                        "/ehs/edge/heartbeat",
+                        "/ehs/edge/alerts/batch",
+                        "/ehs/edge/config/**",
+                        "/ehs/edge/ota/download/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**"
+                ).permitAll();
+                auth.requestMatchers(
+                        HttpMethod.GET,
+                        "/",
+                        "/index.html",
+                        "/favicon.ico",
+                        "/profile/**",
+                        "/ai-outputs/**",
+                        "/sample-images/**",
+                        "/edge-snaps/**"
+                ).permitAll();
+                auth.anyRequest().authenticated();
+            })
+            .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
+            .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class)
+            .addFilterBefore(corsFilter, LogoutFilter.class);
+
+        return http.build();
     }
 }

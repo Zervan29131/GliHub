@@ -1,128 +1,109 @@
-# GliHub 2.0 — AI 驱动的工业安全感知、动态评价与应急决策一体化平台
+# GliHub 3.0 — 端云协同、插件化选装、低算力友好的 AI 工业安全风控与应急决策平台
 
-GliHub 2.0 在既有「Spring Boot + Vue 3 + PostgreSQL + Redis」安全评价底座之上完成智能化架构跃迁，新增独立的 **Python FastAPI 多模态视觉与智能体微服务（`ai-service`）**，无缝纳管本地自训 **`yolov5target-main`** 权重，构建起 **「视觉感知告警 → VLM 多模态复核 → 法规知识库溯源 → 隐患工单派发与 AI 复查 → 动态安全评价报告 → 事故情景应急推演」** 全自动化闭环。
+**GliHub 3.0** 面向石油化工、危化品储运与制造企业，在 100% 保留四大确定性安全评价算法（**Dow F&EI 道氏火灾爆炸指数法**、**LEC 作业条件危险性分析法**、**TNT 当量事故后果模拟法**、**SCL 安全检查表法**）严谨性的基础上，全面升级为**「7 层开源 AI 模型按需选装 + 全链路无独显低精度量化推理 + 独立 YOLO26 边缘自治节点 + 三端单目录无缝迁移」**的新一代智能 EHS 底座。
 
 ---
 
-## 一、系统总体架构与目录结构
+## 一、GliHub 3.0 四大核心能力跃迁
+
+1. **7 层开源 AI 模型全模块化“选装”架构（0 选装亦 100% 可用）**
+   - 每个 AI 模块均通过 `ai-service/plugins/mod_*/manifest.json` 与 `uv sync --extra <mod>` 实现安装级与运行级双解耦；**即使不安装任何 AI 插件，核心安全评价计算、台账管理与 RBAC 权限依然 100% 独立稳定运行**。
+   - **7 大插件矩阵**：`mod-yolov5`（存量 `best.pt` 校准静态 INT8）、`mod-yolo26`（原生无 NMS 四任务 INT8）、`mod-rfdetr`（GPU FP16 高精度检测）、`mod-yoloe`（中文开放词汇零样本排查）、`mod-vlm`（Qwen3-VL/InternVL3 GGUF `Q4_K_M` 二次防误报复核）、`mod-llm-rag`（DeepSeek/Qwen + PostgreSQL `pgvector` 法规溯源与报告推演）、`mod-ocr`（DeepSeek-OCR 2 / PP-OCR INT8 法规票证解析）。
+2. **无独显设备全链路低精度量化（`cpu-int8` / `local-q4` / `gpu-pro`）**
+   - 内置硬件加速自探测（`CUDA` → `Apple Silicon` → `DirectML` → `OpenVINO` → `ARM64/AVX2 CPU INT8`），自适应限制 CPU 线程与静止画面动态降帧。
+   - 8GB 普通无独显笔记本或 2C4G 轻量云主机在 `cpu-int8` 模式下，单帧无 NMS 视觉推理仅 **`~26 ms`（37+ FPS）**，边缘节点常驻内存 **`~306 MB`**。
+3. **完全独立的 Ultralytics YOLO26 边缘计算节点（`edge-yolo26/`）**
+   - **零中心依赖**：无需 PostgreSQL、Valkey 或 Spring Boot，单框架覆盖 `detect` / `pose` / `seg` / `obb` 四大任务，内置 **SQLite WAL 环形缓存断网续传**、**多边形电子围栏（Polygon ROI）**、**SHA256 量化模型 OTA 热更新**及 `:8091` 微型可视化调试台。
+4. **最新 LTS 技术栈与 macOS / Windows / Linux 无缝单目录迁移**
+   - **后端中台（`backend/`）**：**OpenJDK 25 LTS**（紧凑对象头 `-XX:+UseCompactObjectHeaders` + 虚拟线程，向下兼容 JDK 21 LTS）+ **Spring Boot `4.2.0`** + **HikariCP** + **Flyway**（`V1~V3` 自动建库与平滑升版）+ **OpenAPI 3.1**。
+   - **前端工作台（`frontend/`）**：**Node.js 26 LTS** + **Vue `3.5`** + **Vite `6.4`** + **Element Plus** + **Pinia**。
+   - **存储与Python引擎**：**PostgreSQL `18` (`pgvector`)** + **Valkey `9.x`**（纯 JSON 无 AutoType 序列化）+ **Python `3.12+` (`uv`)**；所有模型、上传件、快照与卷统一收敛至 `./data/`。
+
+---
+
+## 二、仓库目录结构
 
 ```text
 GliHub/
-├── backend/                     # Spring Boot 2.5.15 业务中台 (com.glihub)
-│   ├── Dockerfile               # 后端多阶段构建镜像
-│   └── src/
-│       ├── main/java/com/glihub/ehs/ # AI 熔断客户端、闭环编排服务、WebSocket 广播 (/ws/alerts)
-│       └── test/java/com/glihub/ehs/ # 全链路端到端自动化验收测试 (GliHubV2ClosedLoopE2ETest)
-├── ai-service/                  # Python FastAPI 视觉推理、VLM 复核、RAG 与决策智能体服务 (:8090)
-│   ├── Dockerfile               # AI 微服务容器镜像
-│   ├── .env.example             # OpenAI-Compatible 模型端点解耦配置模板
-│   ├── adapters/                # 统一视觉插件层: yolov5_local / yolo26 / rfdetr / yoloe
-│   ├── vlm/                     # 第二阶段多模态复核 (Qwen3-VL / InternVL3 / 离线规则兜底)
-│   ├── rag/                     # PDF/国标条款解析切分 + pgvector/混合检索引擎 + SSE 流式问答
-│   └── agents/                  # Dow/LEC 参数依据推荐、评价报告生成与《现场应急处置行动卡》推演
-├── frontend/                    # Vue 3 + Vite + Element Plus 前端
-│   ├── Dockerfile & nginx.conf  # 前端容器镜像与 REST/SSE/WebSocket 反向代理
-│   └── src/
-│       ├── components/EhsAiCopilot/  # 全局悬浮「GliHub 安全合规助手」抽屉 + WebSocket 告警弹窗
-│       └── views/               # 态势指挥舱 + 五大业务域核心页面
-├── yolov5target-main/           # 存量自训 YOLOv5 安全帽检测模型与权重（无侵入挂载调用）
-├── sql/
-│   ├── glihub.sql               # 1.0 核心 RBAC 与基础业务表初始化脚本
-│   └── glihub_v2_upgrade.sql    # 2.0 增量升级脚本（9 张 ehs_* 表、pgvector 向量列与五大业务域菜单）
+├── backend/            # Spring Boot 4.2 + JDK 25 中台 (安全评价引擎 / 边缘接入网关 / Flyway V1~V3)
+├── frontend/           # Vue 3.5 + Vite 6 前端 (态势指挥舱 / 边缘ROI框选 / 7插件选装中心 / 动态评价)
+├── ai-service/         # FastAPI 模块化 AI 中心服务 (Precision Manager + 7 个可插拔选装插件)
+├── edge-yolo26/        # 零中心依赖独立边缘计算节点 (YOLO26 无NMS INT8 + SQLite 断网续传 + :8091 调试台)
 ├── scripts/
-│   └── e2e_verify.sh            # 一键全链路端到端自动化测试验收脚本
-└── docker-compose.yml           # 一键容器化编排 (pgvector:pg16 + Redis + ai-service + backend + frontend)
+│   └── glihub_cli.py   # macOS / Windows / Linux 跨平台统一管理 CLI (纯标准库)
+├── sql/                # PostgreSQL 初始化与增量归档脚本
+├── data/               # 统一持久化目录 (models / calib_samples / uploads / edge_snaps / backups)
+└── docker-compose.yml  # 多 Profile 跨平台编排 (pg18 + valkey9 + cpu-int8 / local-q4 / edge)
 ```
 
 ---
 
-## 二、五大核心业务域与模型矩阵
+## 三、三端（macOS / Windows / Linux）快速启动指南
 
-| 业务域 / 模块 | 核心功能亮点 | 接入开源模型矩阵（支持本地私有化或兼容 API） |
-| :--- | :--- | :--- |
-| **全域安全态势指挥舱** | 三大场所（生产/储存/公辅）风险热力、厂区危险源与摄像头电子沙盘、实时视觉告警流、隐患闭环率 | WebSocket `/ws/alerts` 秒级推送 |
-| **智能视觉与隐患闭环** | Stage-1 毫秒级框选 + Stage-2 VLM 二次复核防误报；高危违章自动转隐患工单；整改后上传复查图经 AI 自动核验销项 | 存量 `yolov5target-main`（安全帽+人员双检反推） / `Ultralytics YOLO26` / `RF-DETR` / `YOLOE`（自然语言提示词零样本） + `Qwen3-VL` / `InternVL3` |
-| **AI 动态安全评价引擎** | **100% 保留 Dow F&EI、LEC、TNT 当量、SCL 确定性数学公式精度**；新增未闭环隐患触发 LEC 重评预警、AI 参数依据推荐、**TNT 冲击波半径（$R_1..R_4$）平面同心圆叠加**、评价报告 `.doc`/`.md` 导出 | `DeepSeek-V3.2 / R1` 或 `Qwen3.5`（严谨协同，绝不替代确定性公式） |
-| **全息危险源与应急推演** | 「场所 → 危险源（GB 18218 $R$ 值） → 设备 → 摄像头 → 人员 → 法规」六维全息图谱；联动泄漏量与风向秒级生成《现场应急处置行动卡》 | TNT 空间波及计算 + 应急战术智能体 |
-| **EHS 法规标准知识库** | PDF/国标/SDS 条款自动切分与向量化入库；SCL 国标推荐、隐患法条自动引用、全局悬浮 SSE 流式合规问答 | PostgreSQL `pgvector` + `Qwen3-Embedding` + `DeepSeek-OCR 2` / `pypdf` |
-
----
-
-## 三、环境变量配置说明（OpenAI-Compatible 零锁定）
-
-所有 VLM、LLM 与 Embedding 均严格遵循 **OpenAI-Compatible API** 规范，可在 [ai-service/.env](ai-service/.env.example) 或根目录 [.env](.env.example) 中灵活配置：
-
-| 环境变量 | 默认值 | 说明 |
-| :--- | :--- | :--- |
-| `DB_URL` | `jdbc:postgresql://localhost:5432/glihub` | Spring Boot PostgreSQL 连接串 |
-| `AI_SERVICE_URL` | `http://127.0.0.1:8090` | Spring Boot 调用 `ai-service` 地址（离线自动熔断回退） |
-| `YOLOV5_REPO_DIR` | `../yolov5target-main` | 存量 YOLOv5 代码与 `.pt` 权重根目录 |
-| `VLM_BASE_URL` / `VLM_MODEL` | `http://localhost:11434/v1` / `qwen2.5vl:7b` | 视觉复核端点（支持本地 Ollama / vLLM / 云端 Qwen3-VL、InternVL3；未配置时自动启用工业规则复核兜底） |
-| `LLM_BASE_URL` / `LLM_MODEL` | `http://localhost:11434/v1` / `qwen3:8b` | 安全评价报告与合规问答端点（支持 DeepSeek-V3.2/R1、Qwen3.5） |
-| `EMBEDDING_BASE_URL` | 空（内置 1024 维确定性混合检索） | 可配置 `Qwen/Qwen3-Embedding-0.6B` `/v1/embeddings` 端点 |
-
----
-
-## 四、快速启动方式
-
-### 方式一：Docker Compose 全栈一键编排（推荐生产/演示）
-
-内置 `pgvector/pgvector:pg16`，首次启动会自动按序执行 [sql/glihub.sql](sql/glihub.sql) 与 [sql/glihub_v2_upgrade.sql](sql/glihub_v2_upgrade.sql)：
+### 方式 A：Docker Compose 一键容器化启动（推荐跨平台迁移）
 
 ```bash
 cp .env.example .env
-docker compose up -d --build
+
+# 1. 无独显设备推荐：启动核心平台 + CPU INT8 插件引擎 + 独立边缘节点
+docker compose --profile cpu-int8 --profile edge up -d
+
+# 2. 极简 0-AI 纯确定性安全评价与台账模式（最低资源占用）
+docker compose up -d
+
+# 3. 16GB+ 内存本地全离线大模型模式（自动拉起 Ollama Q4_K_M 服务）
+docker compose --profile local-q4 up -d
 ```
-启动完成后访问 `http://localhost:8088`（默认管理员账号：`admin` / `admin123`）。
 
-### 方式二：本地宿主机开发启动（macOS / Linux）
-
-1. **初始化 PostgreSQL 数据库**：
-   ```bash
-   createdb -U postgres -E UTF8 glihub
-   psql -U postgres -d glihub -f sql/glihub.sql
-   psql -U postgres -d glihub -f sql/glihub_v2_upgrade.sql
-   ```
-2. **启动 Python `ai-service` 微服务（`:8090`）**：
-   ```bash
-   cd ai-service
-   python3.11 -m venv .venv
-   ./.venv/bin/pip install -r requirements.txt
-   ./.venv/bin/python main.py
-   ```
-3. **编译并启动 Spring Boot 后端中台（默认 `:8080`，如端口占用可设 `SERVER_PORT=8081`）**：
-   ```bash
-   cd backend
-   mvn clean package -DskipTests
-   java -jar target/glihub-backend.jar
-   ```
-4. **启动 Vue 3 前端开发服务**：
-   ```bash
-   cd frontend
-   npm install
-   VITE_PROXY_TARGET=http://localhost:8080 npx vite --port 5173
-   ```
-
----
-
-## 五、端到端全链路自动化验收
-
-在 PostgreSQL、Redis 与 `ai-service` 启动状态下，执行一键验收脚本：
+### 方式 B：本地源码无卡低精度（`cpu-int8`）开发启动
 
 ```bash
-bash scripts/e2e_verify.sh
-```
+# 1. 环境与硬件加速自检
+python3 scripts/glihub_cli.py check-env
 
-该脚本将自动跑通并断言以下完整业务闭环：
-1. 调用 `yolov5target-main` 权重检出人员未佩戴安全帽违章框；
-2. 触发 VLM 二次复核判定真实高危隐患，并由 RAG 自动匹配引用《安全生产法》条款；
-3. 自动派发 `OPEN` 状态的隐患排查治理工单；
-4. 自动触发所属作业区 LEC 动态风险重评预警与 AI 参数推荐；
-5. 生成并归档结构化《AI 安全评价报告》及重大危险源《现场应急处置行动卡》；
-6. 提交复查样本照片经 AI 自动核验通过，将隐患工单流转至 `CLOSED` 销项闭环。
+# 2. 按需选装 AI 插件（传 --modules none 可验证 0 插件模式）
+python3 scripts/glihub_cli.py install --modules cpu-int8 --with-edge
+
+# 3. 一键导出并生成 YOLO26n 与自训安全帽模型的静态 INT8 (QDQ) ONNX 权重
+python3 scripts/glihub_cli.py quantize
+
+# 4. 分别启动中心 AI 服务(:8090)、边缘自治节点(:8091)、JDK 25 中台(:8080/8081) 与前端(:5173)
+cd ai-service && ./.venv/bin/python main.py
+cd edge-yolo26 && ./.venv/bin/python main.py --port 8091
+cd backend && ./mvnw spring-boot:run
+cd frontend && npm install --legacy-peer-deps && npm run dev
+```
 
 ---
 
-## 六、开源协议
+## 四、独立边缘盒子（`edge-yolo26/`）单独拆分部署
 
-本项目基于 [MIT License](LICENSE) 开源。
+无需复制整个仓库，一键打包即可拷入树莓派 5、RK3588、工控机或任意电脑独立运行：
+
+```bash
+# 在开发机生成包含 INT8 权重的便携部署包 (~19 MB)
+python3 scripts/glihub_cli.py edge-pack
+
+# 在边缘设备上解压即跑（断网自动缓存至本地 SQLite，联网自动续传中心）
+tar -xzf data/backups/glihub-edge-yolo26-standalone.tar.gz
+cd edge-yolo26 && uv sync && ./.venv/bin/python main.py
+# 浏览器打开 http://127.0.0.1:8091 即可绘制电子围栏与实时调试
+```
+
+---
+
+## 五、单文件跨机备份迁移与端到端验收
+
+```bash
+# 一键导出跨平台迁移快照包 (含 ./data 量化权重、抓拍图与数据库快照)
+python3 scripts/glihub_cli.py backup
+
+# 在新机器 (macOS / Windows / Linux) 一键恢复
+python3 scripts/glihub_cli.py restore data/backups/glihub_v3_snapshot_xxx.tar.gz
+
+# 执行纯 CPU (cpu-int8) 端云协同全闭环自动化验收
+python3 scripts/glihub_cli.py e2e
+```
+
+- **默认管理员账号**：`admin` / `admin123`
+- **OpenAPI 3.1 接口文档**：`http://localhost:8080/swagger-ui.html`（`/v3/api-docs`）

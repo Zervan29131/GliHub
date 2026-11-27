@@ -1,0 +1,33 @@
+[project]
+name = "glihub-edge-yolo26"
+version = "3.0.0"
+description = "GliHub 3.0 Standalone Ultralytics YOLO26 Low-Precision Edge Computing Node (Zero Center Dependency)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "onnxruntime>=1.19.0",
+    "opencv-python-headless>=4.10.0",
+    "numpy>=1.26.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "httpx>=0.27.0",
+    "pyyaml>=6.0.1",
+    "python-multipart>=0.0.12",
+    "psutil>=6.0.0",
+]
+
+[project.optional-dependencies]
+export = [
+    "ultralytics>=8.3.0",
+    "onnx>=1.16.0",
+    "onnxslim>=0.1.36",
+]
+openvino = [
+    "openvino>=2024.4.0",
+]
+
+[project.scripts]
+glihub-edge = "main:cli_entry"
+
+[tool.uv]
+package = false

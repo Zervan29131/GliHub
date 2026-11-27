@@ -172,6 +172,40 @@ export function recommendKbLaws(params) {
   return request({ url: '/ehs/kb/recommend', method: 'get', params })
 }
 
+// ==================== 7. GliHub 3.0 边缘计算网关与 OTA ====================
+export function listEdgeNodes() {
+  return request({ url: '/ehs/edge/nodes', method: 'get' })
+}
+
+export function updateEdgeChannelRoi(data) {
+  return request({ url: '/ehs/edge/channels/roi', method: 'put', data })
+}
+
+export function listEdgeOtaModels() {
+  return request({ url: '/ehs/edge/ota/models', method: 'get' })
+}
+
+export function pushEdgeOtaModel(data) {
+  return request({ url: '/ehs/edge/ota/push', method: 'post', data })
+}
+
+// ==================== 8. GliHub 3.0 七大 AI 模型选装中心 ====================
+export function listAiPlugins() {
+  return request({ url: '/ehs/plugins', method: 'get' })
+}
+
+export function toggleAiPlugin(pluginId, data) {
+  return request({ url: `/ehs/plugins/${pluginId}/toggle`, method: 'post', data })
+}
+
+export function switchPrecisionProfile(data) {
+  return request({ url: '/ehs/plugins/profile', method: 'post', data })
+}
+
+export function runOpenVocabDetect(data) {
+  return request({ url: '/ehs/plugins/open-vocab', method: 'post', data, timeout: 45000 })
+}
+
 export function resolveBackendAssetUrl(relPath) {
   if (!relPath) return ''
   if (relPath.startsWith('http://') || relPath.startsWith('https://')) return relPath

@@ -90,8 +90,8 @@
          <el-table-column label="字典编码" align="center" prop="dictCode" />
          <el-table-column label="字典标签" align="center" prop="dictLabel">
             <template #default="scope">
-               <span v-if="scope.row.listClass == '' || scope.row.listClass == 'default'">{{ scope.row.dictLabel }}</span>
-               <el-tag v-else :type="scope.row.listClass == 'primary' ? '' : scope.row.listClass">{{ scope.row.dictLabel }}</el-tag>
+               <span v-if="!scope.row.listClass || scope.row.listClass == 'default'">{{ scope.row.dictLabel }}</span>
+               <el-tag v-else :type="scope.row.listClass == 'primary' ? 'primary' : scope.row.listClass">{{ scope.row.dictLabel }}</el-tag>
             </template>
          </el-table-column>
          <el-table-column label="字典键值" align="center" prop="dictValue" />
@@ -110,13 +110,17 @@
          <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
             <template #default="scope">
                <el-button
-                  type="text"
+                  link
+                  type="primary"
+                  size="small"
                   icon="Edit"
                   @click="handleUpdate(scope.row)"
                   v-hasPermi="['system:dict:edit']"
                >修改</el-button>
                <el-button
-                  type="text"
+                  link
+                  type="danger"
+                  size="small"
                   icon="Delete"
                   @click="handleDelete(scope.row)"
                   v-hasPermi="['system:dict:remove']"
@@ -166,7 +170,7 @@
                   <el-radio
                      v-for="dict in sys_normal_disable"
                      :key="dict.value"
-                     :label="dict.value"
+                     :value="dict.value"
                   >{{ dict.label }}</el-radio>
                </el-radio-group>
             </el-form-item>
@@ -287,7 +291,7 @@ function handleClose() {
 /** 重置按钮操作 */
 function resetQuery() {
   proxy.resetForm("queryRef");
-  queryParams.value.dictType = defaultDictType;
+  queryParams.value.dictType = defaultDictType.value;
   handleQuery();
 }
 /** 新增按钮操作 */
