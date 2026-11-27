@@ -3,7 +3,7 @@ glihub:
   # 项目名称
   name: GliHub
   # 版本
-  version: 1.0.0
+  version: 2.0.0
   # 版权年份
   copyrightYear: 2026
   # 本地上传与导出文件存储目录
@@ -12,6 +12,14 @@ glihub:
   addressEnabled: false
   # 验证码类型 math 数字计算 char 字符验证
   captchaType: math
+  # FastAPI AI 推理与智能体微服务地址
+  aiServiceUrl: ${AI_SERVICE_URL:http://127.0.0.1:8090}
+  # AI 标注图像输出共享目录
+  aiOutputDir: ${AI_OUTPUT_DIR:../ai-service/outputs}
+  # 存量 YOLOv5 测试样本图像目录
+  sampleImageDir: ${SAMPLE_IMAGE_DIR:../yolov5target-main/data/images}
+  # AI 服务调用超时毫秒数
+  aiTimeoutMs: ${AI_TIMEOUT_MS:35000}
 
 # Web 服务配置
 server:

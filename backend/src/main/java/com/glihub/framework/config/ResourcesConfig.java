@@ -1,5 +1,6 @@
 package com.glihub.framework.config;
 
+import java.io.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,22 +29,28 @@ public class ResourcesConfig implements WebMvcConfigurer
     public void addResourceHandlers(ResourceHandlerRegistry registry)
     {
         /** 本地文件上传路径映射 */
+        String profilePath = new File(GliHubConfig.getProfile()).getAbsolutePath() + File.separator;
         registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
-                .addResourceLocations("file:" + GliHubConfig.getProfile() + "/");
+                .addResourceLocations("file:" + profilePath);
+
+        /** AI 视觉检测标注图静态映射 (/ai-outputs/**) */
+        String aiOutPath = new File(GliHubConfig.getAiOutputDir()).getAbsolutePath() + File.separator;
+        registry.addResourceHandler("/ai-outputs/**")
+                .addResourceLocations("file:" + aiOutPath);
+
+        /** 存量 YOLOv5 测试图像样本映射 (/sample-images/**) */
+        String samplePath = new File(GliHubConfig.getSampleImageDir()).getAbsolutePath() + File.separator;
+        registry.addResourceHandler("/sample-images/**")
+                .addResourceLocations("file:" + samplePath);
     }
 
-    /**
-     * 自定义拦截规则
-     */
     @Override
     public void addInterceptors(InterceptorRegistry registry)
     {
-        registry.addInterceptor(repeatSubmitInterceptor).addPathPatterns("/**");
+        registry.addInterceptor(repeatSubmitInterceptor).addPathPatterns("/**")
+                .excludePathPatterns("/ehs/kb/chat/stream", "/ehs/vision/detect/**");
     }
 
-    /**
-     * 跨域配置
-     */
     @Bean
     public CorsFilter corsFilter()
     {

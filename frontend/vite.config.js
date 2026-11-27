@@ -22,8 +22,9 @@ export default defineConfig(({ mode, command }) => {
       open: true,
       proxy: {
         '/dev-api': {
-          target: 'http://localhost:8080',
+          target: env.VITE_PROXY_TARGET || 'http://localhost:8080',
           changeOrigin: true,
+          ws: true,
           rewrite: (p) => p.replace(/^\/dev-api/, '')
         }
       }

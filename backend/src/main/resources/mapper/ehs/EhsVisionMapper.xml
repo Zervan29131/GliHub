@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glihub.ehs.mapper.EhsVisionMapper">
+
+    <resultMap type="com.glihub.ehs.domain.EhsVisionModel" id="EhsVisionModelResult">
+        <id     property="modelId"          column="model_id" />
+        <result property="modelCode"        column="model_code" />
+        <result property="modelName"        column="model_name" />
+        <result property="adapterType"      column="adapter_type" />
+        <result property="taskType"         column="task_type" />
+        <result property="weightsPath"      column="weights_path" />
+        <result property="labelsJson"       column="labels_json" />
+        <result property="confThreshold"    column="conf_threshold" />
+        <result property="iouThreshold"     column="iou_threshold" />
+        <result property="vlmReviewEnabled" column="vlm_review_enabled" />
+        <result property="vlmTriggerConf"   column="vlm_trigger_conf" />
+        <result property="applicablePlaces" column="applicable_places" />
+        <result property="isDefault"        column="is_default" />
+        <result property="status"           column="status" />
+        <result property="remark"           column="remark" />
+        <result property="createBy"         column="create_by" />
+        <result property="createTime"       column="create_time" />
+        <result property="updateTime"       column="update_time" />
+    </resultMap>
+
+    <resultMap type="com.glihub.ehs.domain.EhsCameraPoint" id="EhsCameraPointResult">
+        <id     property="pointId"          column="point_id" />
+        <result property="pointCode"        column="point_code" />
+        <result property="pointName"        column="point_name" />
+        <result property="placeType"        column="place_type" />
+        <result property="deptId"           column="dept_id" />
+        <result property="deptName"         column="dept_name" />
+        <result property="hazardId"         column="hazard_id" />
+        <result property="hazardName"       column="hazard_name" />
+        <result property="defaultModelId"   column="default_model_id" />
+        <result property="defaultModelCode" column="default_model_code" />
+        <result property="streamProtocol"   column="stream_protocol" />
+        <result property="streamUrl"        column="stream_url" />
+        <result property="mapX"             column="map_x" />
+        <result property="mapY"             column="map_y" />
+        <result property="status"           column="status" />
+        <result property="createTime"       column="create_time" />
+    </resultMap>
+
+    <resultMap type="com.glihub.ehs.domain.EhsVisionAlert" id="EhsVisionAlertResult">
+        <id     property="alertId"           column="alert_id" />
+        <result property="alertNo"           column="alert_no" />
+        <result property="pointId"           column="point_id" />
+        <result property="pointName"         column="point_name" />
+        <result property="deptId"            column="dept_id" />
+        <result property="deptName"          column="dept_name" />
+        <result property="placeType"         column="place_type" />
+        <result property="modelCode"         column="model_code" />
+        <result property="promptText"        column="prompt_text" />
+        <result property="rawImageUrl"       column="raw_image_url" />
+        <result property="annotatedImageUrl" column="annotated_image_url" />
+        <result property="detectionsJson"    column="detections_json" />
+        <result property="inferenceMs"       column="inference_ms" />
+        <result property="vlmReviewed"       column="vlm_reviewed" />
+        <result property="vlmModel"          column="vlm_model" />
+        <result property="isRealHazard"      column="is_real_hazard" />
+        <result property="violationType"     column="violation_type" />
+        <result property="severity"          column="severity" />
+        <result property="vlmDescription"    column="vlm_description" />
+        <result property="vlmSuggestion"     column="vlm_suggestion" />
+        <result property="citedLawsJson"     column="cited_laws_json" />
+        <result property="handleStatus"      column="handle_status" />
+        <result property="orderId"           column="order_id" />
+        <result property="createBy"          column="create_by" />
+        <result property="createTime"        column="create_time" />
+    </resultMap>
+
+    <select id="selectModelList" parameterType="com.glihub.ehs.domain.EhsVisionModel" resultMap="EhsVisionModelResult">
+        SELECT model_id, model_code, model_name, adapter_type, task_type, weights_path,
+               labels_json::text AS labels_json, conf_threshold, iou_threshold,
+               vlm_review_enabled, vlm_trigger_conf, applicable_places, is_default, status, remark, create_by, create_time, update_time
+        FROM ehs_vision_model
+        <where>
+            <if test="modelName != null and modelName != ''">AND model_name ILIKE '%' || #{modelName} || '%'</if>
+            <if test="adapterType != null and adapterType != ''">AND adapter_type = #{adapterType}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        ORDER BY is_default DESC, model_id ASC
+    </select>
+
+    <select id="selectModelByCode" resultMap="EhsVisionModelResult">
+        SELECT model_id, model_code, model_name, adapter_type, task_type, weights_path,
+               labels_json::text AS labels_json, conf_threshold, iou_threshold,
+               vlm_review_enabled, vlm_trigger_conf, applicable_places, is_default, status, remark, create_by, create_time, update_time
+        FROM ehs_vision_model
+        WHERE model_code = #{modelCode}
+        LIMIT 1
+    </select>
+
+    <insert id="insertModel" parameterType="com.glihub.ehs.domain.EhsVisionModel" useGeneratedKeys="true" keyProperty="modelId" keyColumn="model_id">
+        INSERT INTO ehs_vision_model (
+            model_code, model_name, adapter_type, task_type, weights_path, labels_json,
+            conf_threshold, iou_threshold, vlm_review_enabled, vlm_trigger_conf,
+            applicable_places, is_default, status, remark, create_by, create_time
+        ) VALUES (
+            #{modelCode}, #{modelName}, #{adapterType}, COALESCE(#{taskType}, 'detect'), #{weightsPath},
+            CAST(COALESCE(#{labelsJson}, '[]') AS jsonb),
+            COALESCE(#{confThreshold}, 0.35), COALESCE(#{iouThreshold}, 0.45),
+            COALESCE(#{vlmReviewEnabled}, TRUE), COALESCE(#{vlmTriggerConf}, 0.75),
+            COALESCE(#{applicablePlaces}, 'production,storage,auxiliary'), COALESCE(#{isDefault}, FALSE),
+            COALESCE(#{status}, '0'), #{remark}, COALESCE(#{createBy}, 'admin'), CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <update id="updateModel" parameterType="com.glihub.ehs.domain.EhsVisionModel">
+        UPDATE ehs_vision_model
+        <set>
+            <if test="modelName != null">model_name = #{modelName},</if>
+            <if test="adapterType != null">adapter_type = #{adapterType},</if>
+            <if test="taskType != null">task_type = #{taskType},</if>
+            <if test="weightsPath != null">weights_path = #{weightsPath},</if>
+            <if test="labelsJson != null">labels_json = CAST(#{labelsJson} AS jsonb),</if>
+            <if test="confThreshold != null">conf_threshold = #{confThreshold},</if>
+            <if test="iouThreshold != null">iou_threshold = #{iouThreshold},</if>
+            <if test="vlmReviewEnabled != null">vlm_review_enabled = #{vlmReviewEnabled},</if>
+            <if test="vlmTriggerConf != null">vlm_trigger_conf = #{vlmTriggerConf},</if>
+            <if test="applicablePlaces != null">applicable_places = #{applicablePlaces},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        WHERE model_id = #{modelId}
+    </update>
+
+    <update id="clearDefaultModels">
+        UPDATE ehs_vision_model SET is_default = FALSE
+    </update>
+
+    <delete id="deleteModelById">
+        DELETE FROM ehs_vision_model WHERE model_id = #{modelId}
+    </delete>
+
+    <select id="selectCameraPointList" parameterType="com.glihub.ehs.domain.EhsCameraPoint" resultMap="EhsCameraPointResult">
+        SELECT p.point_id, p.point_code, p.point_name, p.place_type, p.dept_id, d.dept_name,
+               p.hazard_id, h.hazard_name, p.default_model_id, m.model_code AS default_model_code,
+               p.stream_protocol, p.stream_url, p.map_x, p.map_y, p.status, p.create_time
+        FROM ehs_camera_point p
+        LEFT JOIN sys_dept d ON p.dept_id = d.dept_id
+        LEFT JOIN ehs_hazard_profile h ON p.hazard_id = h.hazard_id
+        LEFT JOIN ehs_vision_model m ON p.default_model_id = m.model_id
+        <where>
+            <if test="placeType != null and placeType != ''">AND p.place_type = #{placeType}</if>
+            <if test="deptId != null">AND p.dept_id = #{deptId}</if>
+            <if test="status != null and status != ''">AND p.status = #{status}</if>
+        </where>
+        ORDER BY p.point_id ASC
+    </select>
+
+    <select id="selectCameraPointById" resultMap="EhsCameraPointResult">
+        SELECT p.point_id, p.point_code, p.point_name, p.place_type, p.dept_id, d.dept_name,
+               p.hazard_id, h.hazard_name, p.default_model_id, m.model_code AS default_model_code,
+               p.stream_protocol, p.stream_url, p.map_x, p.map_y, p.status, p.create_time
+        FROM ehs_camera_point p
+        LEFT JOIN sys_dept d ON p.dept_id = d.dept_id
+        LEFT JOIN ehs_hazard_profile h ON p.hazard_id = h.hazard_id
+        LEFT JOIN ehs_vision_model m ON p.default_model_id = m.model_id
+        WHERE p.point_id = #{pointId}
+    </select>
+
+    <select id="selectAlertList" parameterType="com.glihub.ehs.domain.EhsVisionAlert" resultMap="EhsVisionAlertResult">
+        SELECT a.alert_id, a.alert_no, a.point_id, p.point_name, a.dept_id, d.dept_name,
+               a.place_type, a.model_code, a.prompt_text, a.raw_image_url, a.annotated_image_url,
+               a.detections_json::text AS detections_json, a.inference_ms, a.vlm_reviewed, a.vlm_model,
+               a.is_real_hazard, a.violation_type, a.severity, a.vlm_description, a.vlm_suggestion,
+               a.cited_laws_json::text AS cited_laws_json, a.handle_status, a.order_id, a.create_by, a.create_time
+        FROM ehs_vision_alert a
+        LEFT JOIN sys_dept d ON a.dept_id = d.dept_id
+        LEFT JOIN ehs_camera_point p ON a.point_id = p.point_id
+        <where>
+            <if test="placeType != null and placeType != ''">AND a.place_type = #{placeType}</if>
+            <if test="deptId != null">AND a.dept_id = #{deptId}</if>
+            <if test="severity != null and severity != ''">AND a.severity = #{severity}</if>
+            <if test="handleStatus != null and handleStatus != ''">AND a.handle_status = #{handleStatus}</if>
+            <if test="isRealHazard != null">AND a.is_real_hazard = #{isRealHazard}</if>
+        </where>
+        ORDER BY a.alert_id DESC
+    </select>
+
+    <select id="selectAlertById" resultMap="EhsVisionAlertResult">
+        SELECT a.alert_id, a.alert_no, a.point_id, p.point_name, a.dept_id, d.dept_name,
+               a.place_type, a.model_code, a.prompt_text, a.raw_image_url, a.annotated_image_url,
+               a.detections_json::text AS detections_json, a.inference_ms, a.vlm_reviewed, a.vlm_model,
+               a.is_real_hazard, a.violation_type, a.severity, a.vlm_description, a.vlm_suggestion,
+               a.cited_laws_json::text AS cited_laws_json, a.handle_status, a.order_id, a.create_by, a.create_time
+        FROM ehs_vision_alert a
+        LEFT JOIN sys_dept d ON a.dept_id = d.dept_id
+        LEFT JOIN ehs_camera_point p ON a.point_id = p.point_id
+        WHERE a.alert_id = #{alertId}
+    </select>
+
+    <insert id="insertAlert" parameterType="com.glihub.ehs.domain.EhsVisionAlert" useGeneratedKeys="true" keyProperty="alertId" keyColumn="alert_id">
+        INSERT INTO ehs_vision_alert (
+            alert_no, point_id, dept_id, place_type, model_code, prompt_text,
+            raw_image_url, annotated_image_url, detections_json, inference_ms,
+            vlm_reviewed, vlm_model, is_real_hazard, violation_type, severity,
+            vlm_description, vlm_suggestion, cited_laws_json, handle_status, order_id, create_by, create_time
+        ) VALUES (
+            #{alertNo}, #{pointId}, #{deptId}, COALESCE(#{placeType}, 'production'), #{modelCode}, #{promptText},
+            #{rawImageUrl}, #{annotatedImageUrl}, CAST(COALESCE(#{detectionsJson}, '[]') AS jsonb), COALESCE(#{inferenceMs}, 0),
+            COALESCE(#{vlmReviewed}, FALSE), #{vlmModel}, COALESCE(#{isRealHazard}, TRUE), #{violationType},
+            COALESCE(#{severity}, 'MEDIUM'), #{vlmDescription}, #{vlmSuggestion},
+            CAST(COALESCE(#{citedLawsJson}, '[]') AS jsonb), COALESCE(#{handleStatus}, 'PENDING'), #{orderId},
+            COALESCE(#{createBy}, 'admin'), CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <update id="updateAlertStatus" parameterType="com.glihub.ehs.domain.EhsVisionAlert">
+        UPDATE ehs_vision_alert
+        <set>
+            <if test="handleStatus != null">handle_status = #{handleStatus},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        WHERE alert_id = #{alertId}
+    </update>
+
+    <select id="countRecentRealAlertsByDept" resultType="int">
+        SELECT COUNT(1)
+        FROM ehs_vision_alert
+        WHERE is_real_hazard = TRUE
+          AND handle_status != 'DISMISSED'
+          AND create_time &gt;= CURRENT_TIMESTAMP - INTERVAL '7 days'
+          <if test="deptId != null">AND dept_id = #{deptId}</if>
+    </select>
+
+    <select id="selectAlertCountBySeverity" resultType="map">
+        SELECT severity, COUNT(1) AS cnt
+        FROM ehs_vision_alert
+        WHERE is_real_hazard = TRUE
+        GROUP BY severity
+    </select>
+
+</mapper>

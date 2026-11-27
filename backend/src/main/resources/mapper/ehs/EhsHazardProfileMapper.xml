@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glihub.ehs.mapper.EhsHazardProfileMapper">
+
+    <resultMap type="com.glihub.ehs.domain.EhsHazardProfile" id="EhsHazardProfileResult">
+        <id     property="hazardId"             column="hazard_id" />
+        <result property="hazardCode"           column="hazard_code" />
+        <result property="hazardName"           column="hazard_name" />
+        <result property="placeType"            column="place_type" />
+        <result property="deptId"               column="dept_id" />
+        <result property="deptName"             column="dept_name" />
+        <result property="leader"               column="leader" />
+        <result property="phone"                column="phone" />
+        <result property="relatedEquipIds"      column="related_equip_ids" />
+        <result property="chemicalName"         column="chemical_name" />
+        <result property="casNo"                column="cas_no" />
+        <result property="criticalQtyTon"       column="critical_qty_ton" />
+        <result property="actualQtyTon"         column="actual_qty_ton" />
+        <result property="rIndex"               column="r_index" />
+        <result property="majorHazardGrade"     column="major_hazard_grade" />
+        <result property="dowMf"                column="dow_mf" />
+        <result property="combustionHeatKj"     column="combustion_heat_kj" />
+        <result property="mapX"                 column="map_x" />
+        <result property="mapY"                 column="map_y" />
+        <result property="onDutyCount"          column="on_duty_count" />
+        <result property="riskLevel"            column="risk_level" />
+        <result property="physicochemicalProps" column="physicochemical_props" />
+        <result property="emergencyMeasures"    column="emergency_measures" />
+        <result property="ppeRequirements"      column="ppe_requirements" />
+        <result property="status"               column="status" />
+        <result property="createTime"           column="create_time" />
+    </resultMap>
+
+    <resultMap type="com.glihub.ehs.domain.EhsEmergencyDrill" id="EhsEmergencyDrillResult">
+        <id     property="drillId"            column="drill_id" />
+        <result property="drillNo"            column="drill_no" />
+        <result property="triggerType"        column="trigger_type" />
+        <result property="alertId"            column="alert_id" />
+        <result property="hazardId"           column="hazard_id" />
+        <result property="hazardName"         column="hazard_name" />
+        <result property="accidentType"       column="accident_type" />
+        <result property="leakMassKg"         column="leak_mass_kg" />
+        <result property="windDirection"      column="wind_direction" />
+        <result property="windSpeedMs"        column="wind_speed_ms" />
+        <result property="tntEquivalentKg"    column="tnt_equivalent_kg" />
+        <result property="r1DeathM"           column="r1_death_m" />
+        <result property="r2SeriousM"         column="r2_serious_m" />
+        <result property="r3MinorM"           column="r3_minor_m" />
+        <result property="r4PropertyM"        column="r4_property_m" />
+        <result property="affectedEquipJson"  column="affected_equip_json" />
+        <result property="affectedStaffCount" column="affected_staff_count" />
+        <result property="actionCardMarkdown" column="action_card_markdown" />
+        <result property="createBy"           column="create_by" />
+        <result property="createTime"         column="create_time" />
+    </resultMap>
+
+    <sql id="selectProfileVo">
+        SELECT h.hazard_id, h.hazard_code, h.hazard_name, h.place_type, h.dept_id,
+               d.dept_name, d.leader, d.phone, h.related_equip_ids,
+               h.chemical_name, h.cas_no, h.critical_qty_ton, h.actual_qty_ton, h.r_index,
+               h.major_hazard_grade, h.dow_mf, h.combustion_heat_kj, h.map_x, h.map_y,
+               h.on_duty_count, h.risk_level, h.physicochemical_props, h.emergency_measures,
+               h.ppe_requirements, h.status, h.create_time
+        FROM ehs_hazard_profile h
+        LEFT JOIN sys_dept d ON h.dept_id = d.dept_id
+    </sql>
+
+    <select id="selectProfileList" parameterType="com.glihub.ehs.domain.EhsHazardProfile" resultMap="EhsHazardProfileResult">
+        <include refid="selectProfileVo" />
+        <where>
+            <if test="hazardName != null and hazardName != ''">AND (h.hazard_name ILIKE '%' || #{hazardName} || '%' OR h.chemical_name ILIKE '%' || #{hazardName} || '%')</if>
+            <if test="placeType != null and placeType != ''">AND h.place_type = #{placeType}</if>
+            <if test="deptId != null">AND h.dept_id = #{deptId}</if>
+            <if test="riskLevel != null and riskLevel != ''">AND h.risk_level = #{riskLevel}</if>
+        </where>
+        ORDER BY h.hazard_id ASC
+    </select>
+
+    <select id="selectProfileById" resultMap="EhsHazardProfileResult">
+        <include refid="selectProfileVo" />
+        WHERE h.hazard_id = #{hazardId}
+    </select>
+
+    <insert id="insertProfile" parameterType="com.glihub.ehs.domain.EhsHazardProfile" useGeneratedKeys="true" keyProperty="hazardId" keyColumn="hazard_id">
+        INSERT INTO ehs_hazard_profile (
+            hazard_code, hazard_name, place_type, dept_id, related_equip_ids,
+            chemical_name, cas_no, critical_qty_ton, actual_qty_ton, r_index,
+            major_hazard_grade, dow_mf, combustion_heat_kj, map_x, map_y,
+            on_duty_count, risk_level, physicochemical_props, emergency_measures, ppe_requirements,
+            status, create_by, create_time
+        ) VALUES (
+            #{hazardCode}, #{hazardName}, COALESCE(#{placeType}, 'production'), #{deptId}, COALESCE(#{relatedEquipIds}, ''),
+            #{chemicalName}, #{casNo}, COALESCE(#{criticalQtyTon}, 0), COALESCE(#{actualQtyTon}, 0), COALESCE(#{rIndex}, 0),
+            COALESCE(#{majorHazardGrade}, '非重大危险源'), COALESCE(#{dowMf}, 16), COALESCE(#{combustionHeatKj}, 19930),
+            COALESCE(#{mapX}, 50), COALESCE(#{mapY}, 50), COALESCE(#{onDutyCount}, 4), COALESCE(#{riskLevel}, '较大风险'),
+            #{physicochemicalProps}, #{emergencyMeasures}, #{ppeRequirements},
+            '0', COALESCE(#{createBy}, 'admin'), CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <update id="updateProfile" parameterType="com.glihub.ehs.domain.EhsHazardProfile">
+        UPDATE ehs_hazard_profile
+        <set>
+            <if test="hazardName != null">hazard_name = #{hazardName},</if>
+            <if test="placeType != null">place_type = #{placeType},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="relatedEquipIds != null">related_equip_ids = #{relatedEquipIds},</if>
+            <if test="chemicalName != null">chemical_name = #{chemicalName},</if>
+            <if test="casNo != null">cas_no = #{casNo},</if>
+            <if test="criticalQtyTon != null">critical_qty_ton = #{criticalQtyTon},</if>
+            <if test="actualQtyTon != null">actual_qty_ton = #{actualQtyTon},</if>
+            <if test="rIndex != null">r_index = #{rIndex},</if>
+            <if test="majorHazardGrade != null">major_hazard_grade = #{majorHazardGrade},</if>
+            <if test="dowMf != null">dow_mf = #{dowMf},</if>
+            <if test="combustionHeatKj != null">combustion_heat_kj = #{combustionHeatKj},</if>
+            <if test="mapX != null">map_x = #{mapX},</if>
+            <if test="mapY != null">map_y = #{mapY},</if>
+            <if test="onDutyCount != null">on_duty_count = #{onDutyCount},</if>
+            <if test="riskLevel != null">risk_level = #{riskLevel},</if>
+            <if test="physicochemicalProps != null">physicochemical_props = #{physicochemicalProps},</if>
+            <if test="emergencyMeasures != null">emergency_measures = #{emergencyMeasures},</if>
+            <if test="ppeRequirements != null">ppe_requirements = #{ppeRequirements},</if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        WHERE hazard_id = #{hazardId}
+    </update>
+
+    <delete id="deleteProfileById">
+        DELETE FROM ehs_hazard_profile WHERE hazard_id = #{hazardId}
+    </delete>
+
+    <select id="selectDrillList" parameterType="com.glihub.ehs.domain.EhsEmergencyDrill" resultMap="EhsEmergencyDrillResult">
+        SELECT dr.drill_id, dr.drill_no, dr.trigger_type, dr.alert_id, dr.hazard_id, h.hazard_name,
+               dr.accident_type, dr.leak_mass_kg, dr.wind_direction, dr.wind_speed_ms,
+               dr.tnt_equivalent_kg, dr.r1_death_m, dr.r2_serious_m, dr.r3_minor_m, dr.r4_property_m,
+               dr.affected_equip_json::text AS affected_equip_json, dr.affected_staff_count,
+               dr.action_card_markdown, dr.create_by, dr.create_time
+        FROM ehs_emergency_drill dr
+        LEFT JOIN ehs_hazard_profile h ON dr.hazard_id = h.hazard_id
+        <where>
+            <if test="hazardId != null">AND dr.hazard_id = #{hazardId}</if>
+        </where>
+        ORDER BY dr.drill_id DESC
+    </select>
+
+    <insert id="insertDrill" parameterType="com.glihub.ehs.domain.EhsEmergencyDrill" useGeneratedKeys="true" keyProperty="drillId" keyColumn="drill_id">
+        INSERT INTO ehs_emergency_drill (
+            drill_no, trigger_type, alert_id, hazard_id, accident_type, leak_mass_kg,
+            wind_direction, wind_speed_ms, tnt_equivalent_kg, r1_death_m, r2_serious_m, r3_minor_m, r4_property_m,
+            affected_equip_json, affected_staff_count, action_card_markdown, create_by, create_time
+        ) VALUES (
+            #{drillNo}, COALESCE(#{triggerType}, 'MANUAL_SIM'), #{alertId}, #{hazardId},
+            COALESCE(#{accidentType}, '可燃介质泄漏爆炸'), COALESCE(#{leakMassKg}, 2000),
+            COALESCE(#{windDirection}, '东南风'), COALESCE(#{windSpeedMs}, 3.2),
+            COALESCE(#{tntEquivalentKg}, 0), COALESCE(#{r1DeathM}, 0), COALESCE(#{r2SeriousM}, 0),
+            COALESCE(#{r3MinorM}, 0), COALESCE(#{r4PropertyM}, 0),
+            CAST(COALESCE(#{affectedEquipJson}, '[]') AS jsonb), COALESCE(#{affectedStaffCount}, 0),
+            #{actionCardMarkdown}, COALESCE(#{createBy}, 'admin'), CURRENT_TIMESTAMP
+        )
+    </insert>
+
+</mapper>

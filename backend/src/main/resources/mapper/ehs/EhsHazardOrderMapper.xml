@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glihub.ehs.mapper.EhsHazardOrderMapper">
+
+    <resultMap type="com.glihub.ehs.domain.EhsHazardOrder" id="EhsHazardOrderResult">
+        <id     property="orderId"           column="order_id" />
+        <result property="orderNo"           column="order_no" />
+        <result property="sourceType"        column="source_type" />
+        <result property="alertId"           column="alert_id" />
+        <result property="deptId"            column="dept_id" />
+        <result property="deptName"          column="dept_name" />
+        <result property="placeType"         column="place_type" />
+        <result property="hazardId"          column="hazard_id" />
+        <result property="hazardName"        column="hazard_name" />
+        <result property="equipId"           column="equip_id" />
+        <result property="equipName"         column="equip_name" />
+        <result property="hazardTitle"       column="hazard_title" />
+        <result property="hazardCategory"    column="hazard_category" />
+        <result property="riskLevel"         column="risk_level" />
+        <result property="legalBasis"        column="legal_basis" />
+        <result property="rectifyMeasure"    column="rectify_measure" />
+        <result property="responsibleUserId" column="responsible_user_id" />
+        <result property="responsibleName"   column="responsible_name" />
+        <result property="deadline"          column="deadline" />
+        <result property="rectifyImageUrl"   column="rectify_image_url" />
+        <result property="rectifyNote"       column="rectify_note" />
+        <result property="aiRecheckPassed"   column="ai_recheck_passed" />
+        <result property="aiRecheckComment"  column="ai_recheck_comment" />
+        <result property="status"            column="status" />
+        <result property="createBy"          column="create_by" />
+        <result property="createTime"        column="create_time" />
+        <result property="updateTime"        column="update_time" />
+    </resultMap>
+
+    <sql id="selectOrderVo">
+        SELECT o.order_id, o.order_no, o.source_type, o.alert_id, o.dept_id, d.dept_name,
+               o.place_type, o.hazard_id, h.hazard_name, o.equip_id, p.post_name AS equip_name,
+               o.hazard_title, o.hazard_category, o.risk_level, o.legal_basis, o.rectify_measure,
+               o.responsible_user_id, o.responsible_name, o.deadline, o.rectify_image_url, o.rectify_note,
+               o.ai_recheck_passed, o.ai_recheck_comment, o.status, o.create_by, o.create_time, o.update_time
+        FROM ehs_hazard_order o
+        LEFT JOIN sys_dept d ON o.dept_id = d.dept_id
+        LEFT JOIN ehs_hazard_profile h ON o.hazard_id = h.hazard_id
+        LEFT JOIN sys_post p ON o.equip_id = p.post_id
+    </sql>
+
+    <select id="selectOrderList" parameterType="com.glihub.ehs.domain.EhsHazardOrder" resultMap="EhsHazardOrderResult">
+        <include refid="selectOrderVo" />
+        <where>
+            <if test="hazardTitle != null and hazardTitle != ''">AND o.hazard_title ILIKE '%' || #{hazardTitle} || '%'</if>
+            <if test="hazardCategory != null and hazardCategory != ''">AND o.hazard_category ILIKE '%' || #{hazardCategory} || '%'</if>
+            <if test="placeType != null and placeType != ''">AND o.place_type = #{placeType}</if>
+            <if test="deptId != null">AND o.dept_id = #{deptId}</if>
+            <if test="riskLevel != null and riskLevel != ''">AND o.risk_level = #{riskLevel}</if>
+            <if test="status != null and status != ''">AND o.status = #{status}</if>
+            <if test="sourceType != null and sourceType != ''">AND o.source_type = #{sourceType}</if>
+        </where>
+        ORDER BY o.order_id DESC
+    </select>
+
+    <select id="selectOrderById" resultMap="EhsHazardOrderResult">
+        <include refid="selectOrderVo" />
+        WHERE o.order_id = #{orderId}
+    </select>
+
+    <insert id="insertOrder" parameterType="com.glihub.ehs.domain.EhsHazardOrder" useGeneratedKeys="true" keyProperty="orderId" keyColumn="order_id">
+        INSERT INTO ehs_hazard_order (
+            order_no, source_type, alert_id, dept_id, place_type, hazard_id, equip_id,
+            hazard_title, hazard_category, risk_level, legal_basis, rectify_measure,
+            responsible_user_id, responsible_name, deadline, status, create_by, create_time
+        ) VALUES (
+            #{orderNo}, COALESCE(#{sourceType}, 'MANUAL'), #{alertId}, COALESCE(#{deptId}, 103),
+            COALESCE(#{placeType}, 'production'), #{hazardId}, #{equipId},
+            #{hazardTitle}, COALESCE(#{hazardCategory}, '现场安全隐患'), COALESCE(#{riskLevel}, '较大隐患'),
+            #{legalBasis}, #{rectifyMeasure}, COALESCE(#{responsibleUserId}, 2),
+            COALESCE(#{responsibleName}, '注册安全员'),
+            COALESCE(#{deadline}, CURRENT_TIMESTAMP + INTERVAL '3 days'),
+            COALESCE(#{status}, 'OPEN'), COALESCE(#{createBy}, 'admin'), CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <update id="updateOrder" parameterType="com.glihub.ehs.domain.EhsHazardOrder">
+        UPDATE ehs_hazard_order
+        <set>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="placeType != null">place_type = #{placeType},</if>
+            <if test="hazardId != null">hazard_id = #{hazardId},</if>
+            <if test="equipId != null">equip_id = #{equipId},</if>
+            <if test="hazardTitle != null">hazard_title = #{hazardTitle},</if>
+            <if test="hazardCategory != null">hazard_category = #{hazardCategory},</if>
+            <if test="riskLevel != null">risk_level = #{riskLevel},</if>
+            <if test="legalBasis != null">legal_basis = #{legalBasis},</if>
+            <if test="rectifyMeasure != null">rectify_measure = #{rectifyMeasure},</if>
+            <if test="responsibleUserId != null">responsible_user_id = #{responsibleUserId},</if>
+            <if test="responsibleName != null">responsible_name = #{responsibleName},</if>
+            <if test="deadline != null">deadline = #{deadline},</if>
+            <if test="rectifyImageUrl != null">rectify_image_url = #{rectifyImageUrl},</if>
+            <if test="rectifyNote != null">rectify_note = #{rectifyNote},</if>
+            <if test="aiRecheckPassed != null">ai_recheck_passed = #{aiRecheckPassed},</if>
+            <if test="aiRecheckComment != null">ai_recheck_comment = #{aiRecheckComment},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        WHERE order_id = #{orderId}
+    </update>
+
+    <delete id="deleteOrderByIds">
+        DELETE FROM ehs_hazard_order WHERE order_id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="countOpenOrdersByDept" resultType="int">
+        SELECT COUNT(1)
+        FROM ehs_hazard_order
+        WHERE status != 'CLOSED'
+          <if test="deptId != null">AND dept_id = #{deptId}</if>
+    </select>
+
+    <select id="selectOrderStatsByStatus" resultType="map">
+        SELECT status, COUNT(1) AS cnt
+        FROM ehs_hazard_order
+        GROUP BY status
+    </select>
+
+</mapper>

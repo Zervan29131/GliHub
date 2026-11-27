@@ -65,8 +65,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers("/login", "/captchaImage").permitAll()
-                .antMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**").permitAll()
+                .antMatchers("/login", "/captchaImage", "/ws/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**", "/ai-outputs/**", "/sample-images/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable();

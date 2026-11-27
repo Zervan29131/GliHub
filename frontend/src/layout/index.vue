@@ -9,6 +9,7 @@
       </div>
       <app-main />
       <settings ref="settingRef" />
+      <ehs-ai-copilot />
     </div>
   </div>
 </template>
@@ -17,6 +18,7 @@
 import { useWindowSize } from '@vueuse/core'
 import Sidebar from './components/Sidebar/index.vue'
 import { AppMain, Navbar, Settings, TagsView } from './components'
+import EhsAiCopilot from '@/components/EhsAiCopilot/index.vue'
 import defaultSettings from '@/settings'
 
 import useAppStore from '@/store/modules/app'
