@@ -108,6 +108,20 @@ public class RedisCache
         return operation.get(key);
     }
 
+    public <T> T getCacheObject(final String key, final Class<T> targetType)
+    {
+        Object raw = redisTemplate.opsForValue().get(key);
+        if (raw == null)
+        {
+            return null;
+        }
+        if (targetType.isInstance(raw))
+        {
+            return targetType.cast(raw);
+        }
+        return com.alibaba.fastjson2.JSON.parseObject(com.alibaba.fastjson2.JSON.toJSONString(raw), targetType);
+    }
+
     /**
      * 删除单个对象
      *

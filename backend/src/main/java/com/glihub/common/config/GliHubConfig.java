@@ -1,164 +1,98 @@
 package com.glihub.common.config;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/**
- * GliHub 全局项目配置
- *
- * @author glihub
- */
 @Component
 @ConfigurationProperties(prefix = "glihub")
 public class GliHubConfig
 {
-    /** 项目名称 */
     private String name;
-
-    /** 版本 */
     private String version;
-
-    /** 版权年份 */
     private String copyrightYear;
 
-    /** 上传路径 */
-    private static String profile;
-
-    /** 获取地址开关 */
+    private static String profile = "../data/uploads";
     private static boolean addressEnabled;
-
-    /** 验证码类型 */
-    private static String captchaType;
-
-    /** FastAPI AI 微服务基础 URL */
+    private static String captchaType = "math";
     private static String aiServiceUrl = "http://127.0.0.1:8090";
-
-    /** AI 输出目录 */
     private static String aiOutputDir = "../ai-service/outputs";
-
-    /** 示例测试图像目录 */
-    private static String sampleImageDir = "../yolov5target-main/data/images";
-
-    /** AI 请求超时时间(ms) */
+    private static String sampleImageDir = "../../yolov5target-main/data/images";
+    private static String modelsDir = "../data/models";
+    private static String edgeSnapsDir = "../data/edge_snaps";
+    private static String edgeSharedToken = "glihub-edge-shared-token-v3";
     private static int aiTimeoutMs = 35000;
 
-    public String getName()
-    {
-        return name;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+    public String getVersion() { return version; }
+    public void setVersion(String version) { this.version = version; }
 
-    public String getVersion()
-    {
-        return version;
-    }
+    public String getCopyrightYear() { return copyrightYear; }
+    public void setCopyrightYear(String copyrightYear) { this.copyrightYear = copyrightYear; }
 
-    public void setVersion(String version)
-    {
-        this.version = version;
-    }
+    public static String getProfile() { return profile; }
+    public void setProfile(String profile) { GliHubConfig.profile = profile; }
 
-    public String getCopyrightYear()
-    {
-        return copyrightYear;
-    }
+    public static boolean isAddressEnabled() { return addressEnabled; }
+    public void setAddressEnabled(boolean addressEnabled) { GliHubConfig.addressEnabled = addressEnabled; }
 
-    public void setCopyrightYear(String copyrightYear)
-    {
-        this.copyrightYear = copyrightYear;
-    }
+    public static String getCaptchaType() { return captchaType; }
+    public void setCaptchaType(String captchaType) { GliHubConfig.captchaType = captchaType; }
 
-    public static String getProfile()
-    {
-        return profile;
-    }
+    public static String getAiServiceUrl() { return aiServiceUrl; }
+    public void setAiServiceUrl(String aiServiceUrl) { GliHubConfig.aiServiceUrl = aiServiceUrl; }
 
-    public void setProfile(String profile)
-    {
-        GliHubConfig.profile = profile;
-    }
-
-    public static boolean isAddressEnabled()
-    {
-        return addressEnabled;
-    }
-
-    public void setAddressEnabled(boolean addressEnabled)
-    {
-        GliHubConfig.addressEnabled = addressEnabled;
-    }
-
-    public static String getCaptchaType()
-    {
-        return captchaType;
-    }
-
-    public void setCaptchaType(String captchaType)
-    {
-        GliHubConfig.captchaType = captchaType;
-    }
-
-    public static String getAiServiceUrl()
-    {
-        return aiServiceUrl;
-    }
-
-    public void setAiServiceUrl(String aiServiceUrl)
-    {
-        GliHubConfig.aiServiceUrl = aiServiceUrl;
-    }
-
-    public static String getAiOutputDir()
-    {
-        return aiOutputDir;
-    }
-
-    public void setAiOutputDir(String aiOutputDir)
-    {
-        GliHubConfig.aiOutputDir = aiOutputDir;
-    }
+    public static String getAiOutputDir() { return resolveExistingDir(aiOutputDir, "./ai-service/outputs", "../ai-service/outputs"); }
+    public void setAiOutputDir(String aiOutputDir) { GliHubConfig.aiOutputDir = aiOutputDir; }
 
     public static String getSampleImageDir()
     {
-        return sampleImageDir;
+        return resolveExistingDir(
+                sampleImageDir,
+                "./yolov5target-main/data/images",
+                "../yolov5target-main/data/images",
+                "../../yolov5target-main/data/images",
+                "./data/calib_samples",
+                "../data/calib_samples"
+        );
     }
+    public void setSampleImageDir(String sampleImageDir) { GliHubConfig.sampleImageDir = sampleImageDir; }
 
-    public void setSampleImageDir(String sampleImageDir)
-    {
-        GliHubConfig.sampleImageDir = sampleImageDir;
-    }
+    public static String getModelsDir() { return resolveExistingDir(modelsDir, "./data/models", "../data/models"); }
+    public void setModelsDir(String modelsDir) { GliHubConfig.modelsDir = modelsDir; }
 
-    public static int getAiTimeoutMs()
-    {
-        return aiTimeoutMs;
-    }
+    public static String getEdgeSnapsDir() { return edgeSnapsDir; }
+    public void setEdgeSnapsDir(String edgeSnapsDir) { GliHubConfig.edgeSnapsDir = edgeSnapsDir; }
 
-    public void setAiTimeoutMs(int aiTimeoutMs)
-    {
-        GliHubConfig.aiTimeoutMs = aiTimeoutMs;
-    }
+    public static String getEdgeSharedToken() { return edgeSharedToken; }
+    public void setEdgeSharedToken(String edgeSharedToken) { GliHubConfig.edgeSharedToken = edgeSharedToken; }
 
-    public static String getImportPath()
-    {
-        return getProfile() + "/import";
-    }
+    public static int getAiTimeoutMs() { return aiTimeoutMs; }
+    public void setAiTimeoutMs(int aiTimeoutMs) { GliHubConfig.aiTimeoutMs = aiTimeoutMs; }
 
-    public static String getAvatarPath()
-    {
-        return getProfile() + "/avatar";
-    }
+    public static String getImportPath() { return getProfile() + "/import"; }
+    public static String getAvatarPath() { return getProfile() + "/avatar"; }
+    public static String getDownloadPath() { return getProfile() + "/download/"; }
+    public static String getUploadPath() { return getProfile() + "/upload"; }
 
-    public static String getDownloadPath()
+    private static String resolveExistingDir(String configured, String... fallbacks)
     {
-        return getProfile() + "/download/";
-    }
-
-    public static String getUploadPath()
-    {
-        return getProfile() + "/upload";
+        if (configured != null && Files.exists(Paths.get(configured)))
+        {
+            return configured;
+        }
+        for (String fb : fallbacks)
+        {
+            Path p = Paths.get(fb);
+            if (Files.exists(p))
+            {
+                return fb;
+            }
+        }
+        return configured;
     }
 }

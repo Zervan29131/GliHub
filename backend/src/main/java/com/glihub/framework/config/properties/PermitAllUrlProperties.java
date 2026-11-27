@@ -3,8 +3,7 @@ package com.glihub.framework.config.properties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.RegExUtils;
 import org.springframework.beans.BeansException;
@@ -18,40 +17,32 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import com.glihub.common.annotation.Anonymous;
 
-/**
- * 设置Anonymous注解允许匿名访问的url
- * 
- * @author glihub
- */
 @Configuration
 public class PermitAllUrlProperties implements InitializingBean, ApplicationContextAware
 {
     private static final Pattern PATTERN = Pattern.compile("\\{(.*?)\\}");
+    private static final String ASTERISK = "*";
 
     private ApplicationContext applicationContext;
-
     private List<String> urls = new ArrayList<>();
-
-    public String ASTERISK = "*";
 
     @Override
     public void afterPropertiesSet()
     {
-        RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
+        RequestMappingHandlerMapping mapping = applicationContext.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
 
-        map.keySet().forEach(info -> {
-            HandlerMethod handlerMethod = map.get(info);
-
-            // 获取方法上边的注解 替代path variable 为 *
+        map.forEach((info, handlerMethod) -> {
             Anonymous method = AnnotationUtils.findAnnotation(handlerMethod.getMethod(), Anonymous.class);
-            Optional.ofNullable(method).ifPresent(anonymous -> Objects.requireNonNull(info.getPatternsCondition().getPatterns())
-                    .forEach(url -> urls.add(RegExUtils.replaceAll(url, PATTERN, ASTERISK))));
-
-            // 获取类上边的注解, 替代path variable 为 *
             Anonymous controller = AnnotationUtils.findAnnotation(handlerMethod.getBeanType(), Anonymous.class);
-            Optional.ofNullable(controller).ifPresent(anonymous -> Objects.requireNonNull(info.getPatternsCondition().getPatterns())
-                    .forEach(url -> urls.add(RegExUtils.replaceAll(url, PATTERN, ASTERISK))));
+            if (method != null || controller != null)
+            {
+                Set<String> patterns = info.getPatternValues();
+                if (patterns != null)
+                {
+                    patterns.forEach(url -> urls.add(RegExUtils.replaceAll(url, PATTERN, ASTERISK)));
+                }
+            }
         });
     }
 

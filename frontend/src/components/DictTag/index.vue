@@ -1,19 +1,19 @@
 <template>
   <div>
-    <template v-for="(item, index) in options">
-      <template v-if="values.includes(item.value)">
+    <template v-for="(item, index) in (options || [])">
+      <template v-if="values.includes(String(item.value))">
         <span
-          v-if="item.elTagType == 'default' || item.elTagType == ''"
+          v-if="!item.elTagType || item.elTagType === 'default'"
           :key="item.value"
           :index="index"
           :class="item.elTagClass"
         >{{ item.label }}</span>
         <el-tag
           v-else
-          :disable-transitions="true"
           :key="item.value + ''"
+          :disable-transitions="true"
           :index="index"
-          :type="item.elTagType === 'primary' ? '' : item.elTagType"
+          :type="normalizeTagType(item.elTagType)"
           :class="item.elTagClass"
         >{{ item.label }}</el-tag>
       </template>
@@ -23,23 +23,25 @@
 
 <script setup>
 const props = defineProps({
-  // 数据
   options: {
     type: Array,
-    default: null,
+    default: () => []
   },
-  // 当前的值
-  value: [Number, String, Array],
+  value: [Number, String, Array]
 })
+
+const VALID_TYPES = new Set(['primary', 'success', 'info', 'warning', 'danger'])
+
+function normalizeTagType(raw) {
+  return VALID_TYPES.has(raw) ? raw : 'primary'
+}
 
 const values = computed(() => {
   if (props.value !== null && typeof props.value !== 'undefined') {
-    return Array.isArray(props.value) ? props.value : [String(props.value)];
-  } else {
-    return [];
+    return Array.isArray(props.value) ? props.value.map(String) : [String(props.value)]
   }
+  return []
 })
-
 </script>
 
 <style scoped>

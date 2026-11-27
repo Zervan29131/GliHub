@@ -1,8 +1,8 @@
-from abc import ABC, abstractmethod
+from __future__ import annotations
+
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 import uuid
-import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from pydantic import BaseModel, Field
@@ -29,11 +29,14 @@ class VisionInferenceOutput(BaseModel):
     detections: List[DetectionBox] = Field(default_factory=list)
     has_violation: bool = False
     fallback_used: bool = False
+    precision: str = "int8"
+    plugin_id: Optional[str] = None
     note: Optional[str] = None
 
 
 LABEL_ZH_MAP = {
     "With Helmet": "已佩戴安全帽",
+    "with_helmet": "已佩戴安全帽",
     "without_helmet": "未佩戴安全帽(违章)",
     "no_helmet": "未佩戴安全帽(违章)",
     "helmet": "已佩戴安全帽",
@@ -45,8 +48,11 @@ LABEL_ZH_MAP = {
     "motorcycle": "机动二轮车",
     "bicycle": "非机动车",
     "fire hydrant": "消火栓设施",
-    "bottle": "散落容器/化学品瓶",
-    "backpack": "随身携行包",
+    "bottle": "散落容器/化学品桶",
+    "cup": "敞口容器",
+    "backpack": "通道堆放杂物/携行包",
+    "suitcase": "堵塞通道箱体",
+    "chair": "占道杂物",
     "smoke": "异常烟雾(险情)",
     "fire": "明火告警(险情)",
     "leakage": "跑冒滴漏异常",
@@ -63,6 +69,7 @@ def _load_cjk_font(size: int = 18):
         "/System/Library/Fonts/STHeiti Light.ttc",
         "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
         "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "C:/Windows/Fonts/msyh.ttc",
     ]
     for fp in font_candidates:
         if Path(fp).exists():
@@ -74,15 +81,22 @@ def _load_cjk_font(size: int = 18):
 
 
 def render_detections(
-    bgr_image: np.ndarray,
+    image_input: Union[np.ndarray, Image.Image, Path],
     detections: List[DetectionBox],
     output_dir: Path,
     prefix: str = "det",
 ) -> Tuple[Path, str]:
-    """在原图上绘制合规框(绿/蓝)与违章告警框(红)，保存并返回本地路径与静态相对URL."""
+    """Pure Pillow-compatible annotator so 0-plugin mode works even without OpenCV installed."""
     output_dir.mkdir(parents=True, exist_ok=True)
-    rgb = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
-    pil_img = Image.fromarray(rgb)
+    if isinstance(image_input, Path):
+        pil_img = Image.open(image_input).convert("RGB")
+    elif isinstance(image_input, Image.Image):
+        pil_img = image_input.convert("RGB")
+    else:
+        # BGR ndarray from OpenCV -> RGB
+        rgb = image_input[..., ::-1].copy()
+        pil_img = Image.fromarray(rgb)
+
     draw = ImageDraw.Draw(pil_img)
     font = _load_cjk_font(18)
 
@@ -92,48 +106,11 @@ def render_detections(
         draw.rectangle([x1, y1, x2, y2], outline=color, width=3)
         caption = f"{det.label_zh} {det.confidence:.2f}"
         bbox_txt = draw.textbbox((x1, max(0, y1 - 24)), caption, font=font)
-        pad_box = [
-            bbox_txt[0] - 2,
-            bbox_txt[1] - 2,
-            bbox_txt[2] + 4,
-            bbox_txt[3] + 2,
-        ]
+        pad_box = [bbox_txt[0] - 2, bbox_txt[1] - 2, bbox_txt[2] + 4, bbox_txt[3] + 2]
         draw.rectangle(pad_box, fill=color)
         draw.text((x1 + 1, max(0, y1 - 24)), caption, fill=(255, 255, 255), font=font)
 
     filename = f"{prefix}_{uuid.uuid4().hex[:10]}.jpg"
     save_path = output_dir / filename
-    pil_img.save(save_path, format="JPEG", quality=92)
+    pil_img.save(save_path, format="JPEG", quality=90)
     return save_path, f"/outputs/{filename}"
-
-
-class AbstractVisionDetector(ABC):
-    def __init__(self, model_code: str, weights_path: Optional[Path], device: str = "cpu"):
-        self.model_code = model_code
-        self.weights_path = weights_path
-        self.device = device
-        self.loaded = False
-
-    @property
-    @abstractmethod
-    def adapter_type(self) -> str:
-        raise NotImplementedError
-
-    @abstractmethod
-    def is_available(self) -> Tuple[bool, str]:
-        raise NotImplementedError
-
-    @abstractmethod
-    def load(self) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    def predict(
-        self,
-        image_path: Path,
-        conf_thres: float = 0.35,
-        iou_thres: float = 0.45,
-        prompt_text: Optional[str] = None,
-        output_dir: Optional[Path] = None,
-    ) -> VisionInferenceOutput:
-        raise NotImplementedError

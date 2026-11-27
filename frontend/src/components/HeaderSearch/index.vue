@@ -8,11 +8,16 @@
       filterable
       default-first-option
       remote
-      placeholder="Search"
+      placeholder="搜索页面 / 功能菜单"
       class="header-search-select"
       @change="change"
     >
-      <el-option v-for="option in options" :key="option.item.path" :value="option.item" :label="option.item.title.join(' > ')" />
+      <el-option
+        v-for="option in options"
+        :key="option.item.path"
+        :value="option.item.path"
+        :label="option.item.title.join(' > ')"
+      />
     </el-select>
   </div>
 </template>
@@ -23,84 +28,72 @@ import { getNormalPath } from '@/utils/glihub'
 import { isHttp } from '@/utils/validate'
 import usePermissionStore from '@/store/modules/permission'
 
-const search = ref('');
-const options = ref([]);
-const searchPool = ref([]);
-const show = ref(false);
-const fuse = ref(undefined);
-const headerSearchSelectRef = ref(null);
-const router = useRouter();
-const routes = computed(() => usePermissionStore().routes);
+const search = ref('')
+const options = ref([])
+const searchPool = ref([])
+const show = ref(false)
+const fuse = ref(null)
+const headerSearchSelectRef = ref(null)
+const router = useRouter()
+const routes = computed(() => usePermissionStore().routes)
 
 function click() {
   show.value = !show.value
   if (show.value) {
-    headerSearchSelectRef.value && headerSearchSelectRef.value.focus()
+    headerSearchSelectRef.value?.focus()
   }
-};
+}
+
 function close() {
-  headerSearchSelectRef.value && headerSearchSelectRef.value.blur()
+  headerSearchSelectRef.value?.blur()
   options.value = []
   show.value = false
 }
-function change(val) {
-  const path = val.path;
+
+function change(path) {
+  if (!path) return
   if (isHttp(path)) {
-    // http(s):// 路径新窗口打开
-    const pindex = path.indexOf("http");
-    window.open(path.substr(pindex, path.length), "_blank");
+    const pindex = path.indexOf('http')
+    window.open(path.slice(pindex), '_blank')
   } else {
     router.push(path)
   }
-
   search.value = ''
   options.value = []
   nextTick(() => {
     show.value = false
   })
 }
+
 function initFuse(list) {
-  fuse.value = new Fuse(list, {
+  fuse.value = new Fuse(list || [], {
     shouldSort: true,
     threshold: 0.4,
     location: 0,
     distance: 100,
-    maxPatternLength: 32,
     minMatchCharLength: 1,
-    keys: [{
-      name: 'title',
-      weight: 0.7
-    }, {
-      name: 'path',
-      weight: 0.3
-    }]
+    keys: [
+      { name: 'title', weight: 0.7 },
+      { name: 'path', weight: 0.3 }
+    ]
   })
 }
-// Filter out the routes that can be displayed in the sidebar
-// And generate the internationalized title
-function generateRoutes(routes, basePath = '', prefixTitle = []) {
-  let res = []
 
-  for (const r of routes) {
-    // skip hidden router
-    if (r.hidden) { continue }
-    const p = r.path.length > 0 && r.path[0] === '/' ? r.path : '/' + r.path;
+function generateRoutes(routeList, basePath = '', prefixTitle = []) {
+  let res = []
+  for (const r of routeList || []) {
+    if (r.hidden) continue
+    const p = r.path && r.path.length > 0 && r.path[0] === '/' ? r.path : '/' + (r.path || '')
     const data = {
       path: !isHttp(r.path) ? getNormalPath(basePath + p) : r.path,
       title: [...prefixTitle]
     }
-
     if (r.meta && r.meta.title) {
       data.title = [...data.title, r.meta.title]
-
       if (r.redirect !== 'noRedirect') {
-        // only push the routes with title
-        // special case: need to exclude parent router without redirect
         res.push(data)
       }
     }
-
-    // recursive child routes
     if (r.children) {
       const tempRoutes = generateRoutes(r.children, data.path, data.title)
       if (tempRoutes.length >= 1) {
@@ -110,21 +103,26 @@ function generateRoutes(routes, basePath = '', prefixTitle = []) {
   }
   return res
 }
+
 function querySearch(query) {
-  if (query !== '') {
+  if (query !== '' && fuse.value) {
     options.value = fuse.value.search(query)
   } else {
     options.value = []
   }
 }
 
-onMounted(() => {
-  searchPool.value = generateRoutes(routes.value);
-})
-
 watchEffect(() => {
   searchPool.value = generateRoutes(routes.value)
 })
+
+watch(
+  searchPool,
+  (list) => {
+    initFuse(list)
+  },
+  { immediate: true }
+)
 
 watch(show, (value) => {
   if (value) {
@@ -133,13 +131,9 @@ watch(show, (value) => {
     document.body.removeEventListener('click', close)
   }
 })
-
-watch(searchPool, (list) => {
-  initFuse(list)
-})
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .header-search {
   font-size: 0 !important;
 
@@ -153,6 +147,7 @@ watch(searchPool, (list) => {
     font-size: 18px;
     transition: width 0.2s;
     width: 0;
+    min-width: 0 !important;
     overflow: hidden;
     background: transparent;
     border-radius: 0;

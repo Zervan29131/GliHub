@@ -1,8 +1,8 @@
 {
   "name": "glihub-frontend",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "private": true,
-  "description": "GliHub 安全评价与安全信息管理系统前端",
+  "description": "GliHub 3.0 端云协同 AI 工业安全风控与应急决策平台前端",
   "author": "Zervan",
   "license": "MIT",
   "scripts": {
@@ -13,29 +13,28 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "1.1.4",
-    "@vueuse/core": "8.5.0",
-    "axios": "0.26.1",
-    "echarts": "5.3.2",
-    "element-plus": "2.1.8",
-    "file-saver": "2.0.5",
-    "fuse.js": "6.5.3",
-    "js-cookie": "3.0.1",
-    "jsencrypt": "3.2.1",
-    "nprogress": "0.2.0",
-    "pinia": "2.0.14",
-    "vue": "3.2.31",
-    "vue-cropper": "1.0.3",
-    "vue-router": "4.0.14"
+    "@element-plus/icons-vue": "^2.3.1",
+    "@vueuse/core": "^11.3.0",
+    "axios": "^1.7.9",
+    "echarts": "^5.5.1",
+    "element-plus": "^2.9.4",
+    "file-saver": "^2.0.5",
+    "fuse.js": "^7.0.0",
+    "js-cookie": "^3.0.5",
+    "jsencrypt": "^3.3.2",
+    "nprogress": "^0.2.0",
+    "pinia": "^2.3.0",
+    "vue": "^3.5.13",
+    "vue-cropper": "^1.1.4",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "2.3.3",
-    "@vue/compiler-sfc": "3.2.36",
-    "sass": "1.52.1",
-    "unplugin-auto-import": "0.8.5",
-    "vite": "2.9.9",
-    "vite-plugin-compression": "0.5.1",
-    "vite-plugin-svg-icons": "2.0.1",
-    "vite-plugin-vue-setup-extend": "0.4.0"
+    "@vitejs/plugin-vue": "^5.2.1",
+    "fast-glob": "^3.3.3",
+    "sass": "^1.83.0",
+    "unplugin-auto-import": "^0.18.6",
+    "vite": "^6.4.6",
+    "vite-plugin-compression": "^0.5.1",
+    "vite-plugin-svg-icons": "^2.0.1"
   }
 }

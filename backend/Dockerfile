@@ -1,12 +1,19 @@
-FROM maven:3.9-eclipse-temurin-11 AS builder
+# GliHub 3.0 Spring Boot 4.2 + OpenJDK 25 LTS Multi-Arch Image
+FROM eclipse-temurin:25-jdk-noble AS builder
 WORKDIR /build
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean package -DskipTests
+COPY mvnw pom.xml ./
+COPY .mvn .mvn
+RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
+COPY src src
+RUN ./mvnw clean package -DskipTests -B
 
-FROM eclipse-temurin:11-jre
+FROM eclipse-temurin:25-jre-noble
+ENV TZ=Asia/Shanghai \
+    JAVA_OPTS="-XX:+IgnoreUnrecognizedVMOptions -XX:+UseCompactObjectHeaders -XX:+UseZGC -Xms256m -Xmx768m"
 WORKDIR /app
 COPY --from=builder /build/target/glihub-backend.jar /app/glihub-backend.jar
-RUN mkdir -p /app/upload /app/logs /app/ai-outputs
+RUN mkdir -p /data/uploads /data/models /data/edge_snaps
+
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/glihub-backend.jar"]
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/glihub-backend.jar"]

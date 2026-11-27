@@ -1,0 +1,60 @@
+# GliHub 3.0 — Standalone YOLO26 Edge Node Configuration
+# Copy to config.yaml to customize. Zero PostgreSQL / Valkey / Spring Boot required on edge.
+
+node:
+  node_code: "edge-chem-zone-01"
+  node_name: "一车间危化品罐区边缘盒子 #01"
+  local_host: "0.0.0.0"
+  local_port: 8091
+
+center:
+  enabled: true
+  base_url: "http://127.0.0.1:8081"
+  edge_token: "glihub-edge-shared-token-v3"
+  heartbeat_interval_sec: 15
+  batch_upload_size: 10
+  flush_interval_sec: 3.0
+  request_timeout_sec: 8.0
+
+inference:
+  # Precision routing: auto | int8 | fp16 | fp32
+  precision_mode: "int8"
+  # Primary no-NMS end-to-end model (.int8.onnx / .fp16.onnx / .onnx)
+  primary_model_path: "../data/models/yolo26n.int8.onnx"
+  # Optional auxiliary custom PPE helmet weight exported from yolov5target-main/best.pt
+  ppe_helmet_model_path: "../data/models/yolov5_helmet.int8.onnx"
+  imgsz: 640
+  conf_threshold: 0.35
+  iou_threshold: 0.45
+  # Cap CPU threads to avoid starving low-power edge boxes (0 = auto half cores, max 4)
+  cpu_threads: 0
+
+storage:
+  sqlite_path: "./edge_data/offline_outbox.db"
+  max_queue_records: 5000
+  models_dir: "../data/models"
+  snapshots_dir: "./edge_data/snapshots"
+
+channels:
+  - channel_code: "cam-tank-01"
+    channel_name: "甲类罐区北侧通道枪机"
+    dept_id: 103
+    place_type: "STORAGE"
+    hazard_id: 1
+    # Supports rtsp://..., usb index ("0"), local .mp4, or image directory
+    stream_source: "../../yolov5target-main/data/images"
+    # Unified 4 tasks: detect | pose | seg | obb
+    task_type: "detect"
+    conf_threshold: 0.35
+    silence_window_sec: 30
+    dynamic_fps:
+      enabled: true
+      idle_fps: 0.5
+      active_fps: 8.0
+      motion_pixel_threshold: 0.015
+    # Normalized [0.0 ~ 1.0] polygon ROI fence (clockwise/counter-clockwise)
+    roi_polygon:
+      - [0.05, 0.05]
+      - [0.95, 0.05]
+      - [0.95, 0.95]
+      - [0.05, 0.95]

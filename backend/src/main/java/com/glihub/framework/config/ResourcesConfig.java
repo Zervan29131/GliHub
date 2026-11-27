@@ -14,11 +14,6 @@ import com.glihub.common.config.GliHubConfig;
 import com.glihub.common.constant.Constants;
 import com.glihub.framework.interceptor.RepeatSubmitInterceptor;
 
-/**
- * Web 静态资源与跨域通用配置
- *
- * @author glihub
- */
 @Configuration
 public class ResourcesConfig implements WebMvcConfigurer
 {
@@ -28,27 +23,28 @@ public class ResourcesConfig implements WebMvcConfigurer
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry)
     {
-        /** 本地文件上传路径映射 */
         String profilePath = new File(GliHubConfig.getProfile()).getAbsolutePath() + File.separator;
         registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**")
                 .addResourceLocations("file:" + profilePath);
 
-        /** AI 视觉检测标注图静态映射 (/ai-outputs/**) */
         String aiOutPath = new File(GliHubConfig.getAiOutputDir()).getAbsolutePath() + File.separator;
         registry.addResourceHandler("/ai-outputs/**")
                 .addResourceLocations("file:" + aiOutPath);
 
-        /** 存量 YOLOv5 测试图像样本映射 (/sample-images/**) */
         String samplePath = new File(GliHubConfig.getSampleImageDir()).getAbsolutePath() + File.separator;
         registry.addResourceHandler("/sample-images/**")
                 .addResourceLocations("file:" + samplePath);
+
+        String edgeSnapsPath = new File(GliHubConfig.getEdgeSnapsDir()).getAbsolutePath() + File.separator;
+        registry.addResourceHandler("/edge-snaps/**")
+                .addResourceLocations("file:" + edgeSnapsPath);
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry)
     {
         registry.addInterceptor(repeatSubmitInterceptor).addPathPatterns("/**")
-                .excludePathPatterns("/ehs/kb/chat/stream", "/ehs/vision/detect/**");
+                .excludePathPatterns("/ehs/kb/chat/stream", "/ehs/vision/detect/**", "/ehs/edge/**");
     }
 
     @Bean

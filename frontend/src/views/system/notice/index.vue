@@ -56,9 +56,9 @@
          </el-table-column>
          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template #default="scope">
-               <el-button type="text" icon="Edit" @click="handleUpdate(scope.row)"
+               <el-button link type="primary" size="small" icon="Edit" @click="handleUpdate(scope.row)"
                   v-hasPermi="['system:notice:edit']">详情</el-button>
-               <el-button type="text" icon="Delete" @click="handleDelete(scope.row)"
+               <el-button link type="danger" size="small" icon="Delete" @click="handleDelete(scope.row)"
                   v-hasPermi="['system:notice:remove']">删除</el-button>
             </template>
          </el-table-column>
@@ -87,8 +87,7 @@
                <el-col :span="24">
                   <el-form-item label="状态">
                      <el-radio-group v-model="form.status">
-                        <el-radio v-for="dict in sys_notice_status" :key="dict.value" :label="dict.value">{{ dict.label
-                           }}</el-radio>
+                        <el-radio v-for="dict in sys_notice_status" :key="dict.value" :value="dict.value">{{ dict.label }}</el-radio>
                      </el-radio-group>
                   </el-form-item>
                </el-col>

@@ -4,7 +4,7 @@ import { createApp } from 'vue'
 import Cookies from 'js-cookie'
 
 import ElementPlus from 'element-plus'
-import locale from 'element-plus/lib/locale/lang/zh-cn' // 中文语言
+import locale from 'element-plus/es/locale/lang/zh-cn' // 中文语言
 
 import '@/assets/styles/index.scss' // global css
 

@@ -93,9 +93,9 @@
         </el-form-item>
         <el-form-item label="隐患级别">
           <el-radio-group v-model="form.riskLevel">
-            <el-radio label="重大隐患">重大隐患</el-radio>
-            <el-radio label="较大隐患">较大隐患</el-radio>
-            <el-radio label="一般隐患">一般隐患</el-radio>
+            <el-radio value="重大隐患">重大隐患</el-radio>
+            <el-radio value="较大隐患">较大隐患</el-radio>
+            <el-radio value="一般隐患">一般隐患</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="法规标准依据">

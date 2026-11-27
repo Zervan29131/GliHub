@@ -157,10 +157,11 @@ function handleDelete(index) {
 
 // 获取文件名称
 function getFileName(name) {
+  if (!name) return "";
   if (name.lastIndexOf("/") > -1) {
     return name.slice(name.lastIndexOf("/") + 1);
   } else {
-    return "";
+    return name;
   }
 }
 

@@ -1,0 +1,16 @@
+{
+  "plugin_id": "mod-yolo26",
+  "name": "Ultralytics YOLO26 无 NMS 实时检测插件",
+  "layer": "实时检测升级层 (Edge & Center Real-Time)",
+  "order": 2,
+  "description": "2026 新一代原生端到端无 NMS 模型 (yolo26n.int8.onnx)，CPU INT8 吞吐达 35+ FPS，支持检测、姿态、分割与旋转框。",
+  "uv_extra": "yolo26",
+  "requires_gpu": false,
+  "default_enabled": true,
+  "min_ram_mb": 160,
+  "supported_precisions": ["int8", "fp16", "fp32"],
+  "default_precision_cpu": "int8",
+  "required_imports": ["onnxruntime", "cv2"],
+  "fallback_behavior": "停用时自动回退至已选装的 mod-yolov5 或直接接收独立 edge-yolo26 节点上报流。",
+  "entrypoint": "plugins.mod_yolo26.plugin:Yolo26Plugin"
+}

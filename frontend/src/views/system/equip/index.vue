@@ -56,8 +56,6 @@
             <el-table-column label="运行使用情况" align="center" prop="status">
                 <template #default="scope">
                     <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
-
-                    <!-- <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" /> -->
                 </template>
             </el-table-column>
             <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -67,9 +65,9 @@
             </el-table-column>
             <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
                 <template #default="scope">
-                    <el-button size="mini" type="text" icon="Edit" @click="handleUpdate(scope.row)"
+                    <el-button link type="primary" size="small" icon="Edit" @click="handleUpdate(scope.row)"
                         v-hasPermi="['system:post:edit']">修改</el-button>
-                    <el-button size="mini" type="text" icon="Delete" @click="handleDelete(scope.row)"
+                    <el-button link type="danger" size="small" icon="Delete" @click="handleDelete(scope.row)"
                         v-hasPermi="['system:post:remove']">删除</el-button>
                 </template>
             </el-table-column>
@@ -106,21 +104,9 @@
                 <el-form-item label="联系方式" prop="postContact">
                     <el-input v-model="form.postContact" placeholder="请输入联系方式" />
                 </el-form-item>
-                <!-- <el-form-item label="设备状态" prop="status">
-                    <el-radio-group v-model="form.status">
-                        <el-radio v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.value">{{
-                            dict.label }}</el-radio>
-                    </el-radio-group>
-                </el-form-item> -->
-                <!-- 
-                <el-form-item label="设备顺序" prop="postSort">
-                    <el-input-number v-model="form.postSort" controls-position="right" :min="0" />
-                </el-form-item> -->
-
                 <el-form-item label="设备状态" prop="status">
                     <el-radio-group v-model="form.status">
-                        <el-radio v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.value">{{ dict.label
-                            }}</el-radio>
+                        <el-radio v-for="dict in sys_normal_disable" :key="dict.value" :value="dict.value">{{ dict.label }}</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">

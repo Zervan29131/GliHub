@@ -1,0 +1,16 @@
+{
+  "plugin_id": "mod-rfdetr",
+  "name": "RF-DETR 工业高精度检测插件 (GPU)",
+  "layer": "高精度检测层 (GPU Transformer)",
+  "order": 3,
+  "description": "Apache 2.0 开源 DINOv2 主干实时 Transformer 检测器，面向复杂化工管廊微小跑冒滴漏与仪表异常高精度定位。",
+  "uv_extra": "rfdetr",
+  "requires_gpu": true,
+  "default_enabled": false,
+  "min_ram_mb": 1800,
+  "supported_precisions": ["fp16", "fp32"],
+  "default_precision_cpu": "fp16",
+  "required_imports": ["rfdetr"],
+  "fallback_behavior": "无独显 (cpu-int8 / local-q4) 环境自动置灰保护内存，调用请求平滑降级至 mod-yolo26 INT8 引擎。",
+  "entrypoint": "plugins.mod_rfdetr.plugin:RfDetrPlugin"
+}
