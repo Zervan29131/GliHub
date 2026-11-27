@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glihub.ehs.mapper.EhsEvalRecordMapper">
+
+    <resultMap type="com.glihub.ehs.domain.EhsEvalRecord" id="EhsEvalRecordResult">
+        <id     property="evalId"             column="eval_id" />
+        <result property="evalNo"             column="eval_no" />
+        <result property="placeType"          column="place_type" />
+        <result property="deptId"             column="dept_id" />
+        <result property="areaName"           column="area_name" />
+        <result property="hazardId"           column="hazard_id" />
+        <result property="evalMethod"         column="eval_method" />
+        <result property="inputParamsJson"    column="input_params_json" />
+        <result property="resultMetricsJson"  column="result_metrics_json" />
+        <result property="riskGrade"          column="risk_grade" />
+        <result property="dynamicAlertCount"  column="dynamic_alert_count" />
+        <result property="openOrderCount"     column="open_order_count" />
+        <result property="reEvalRecommended"  column="re_eval_recommended" />
+        <result property="aiParamAdviceJson"  column="ai_param_advice_json" />
+        <result property="aiReportMarkdown"   column="ai_report_markdown" />
+        <result property="evaluator"          column="evaluator" />
+        <result property="createBy"           column="create_by" />
+        <result property="createTime"         column="create_time" />
+    </resultMap>
+
+    <select id="selectRecordList" parameterType="com.glihub.ehs.domain.EhsEvalRecord" resultMap="EhsEvalRecordResult">
+        SELECT eval_id, eval_no, place_type, dept_id, area_name, hazard_id, eval_method,
+               input_params_json::text AS input_params_json,
+               result_metrics_json::text AS result_metrics_json,
+               risk_grade, dynamic_alert_count, open_order_count, re_eval_recommended,
+               ai_param_advice_json::text AS ai_param_advice_json,
+               ai_report_markdown, evaluator, create_by, create_time
+        FROM ehs_eval_record
+        <where>
+            <if test="placeType != null and placeType != ''">AND place_type = #{placeType}</if>
+            <if test="deptId != null">AND dept_id = #{deptId}</if>
+            <if test="evalMethod != null and evalMethod != ''">AND eval_method = #{evalMethod}</if>
+            <if test="areaName != null and areaName != ''">AND area_name ILIKE '%' || #{areaName} || '%'</if>
+        </where>
+        ORDER BY eval_id DESC
+    </select>
+
+    <select id="selectRecordById" resultMap="EhsEvalRecordResult">
+        SELECT eval_id, eval_no, place_type, dept_id, area_name, hazard_id, eval_method,
+               input_params_json::text AS input_params_json,
+               result_metrics_json::text AS result_metrics_json,
+               risk_grade, dynamic_alert_count, open_order_count, re_eval_recommended,
+               ai_param_advice_json::text AS ai_param_advice_json,
+               ai_report_markdown, evaluator, create_by, create_time
+        FROM ehs_eval_record
+        WHERE eval_id = #{evalId}
+    </select>
+
+    <insert id="insertRecord" parameterType="com.glihub.ehs.domain.EhsEvalRecord" useGeneratedKeys="true" keyProperty="evalId" keyColumn="eval_id">
+        INSERT INTO ehs_eval_record (
+            eval_no, place_type, dept_id, area_name, hazard_id, eval_method,
+            input_params_json, result_metrics_json, risk_grade,
+            dynamic_alert_count, open_order_count, re_eval_recommended,
+            ai_param_advice_json, ai_report_markdown, evaluator, create_by, create_time
+        ) VALUES (
+            #{evalNo}, COALESCE(#{placeType}, 'production'), #{deptId}, #{areaName}, #{hazardId}, #{evalMethod},
+            CAST(COALESCE(#{inputParamsJson}, '{}') AS jsonb),
+            CAST(COALESCE(#{resultMetricsJson}, '{}') AS jsonb),
+            COALESCE(#{riskGrade}, '一般风险'),
+            COALESCE(#{dynamicAlertCount}, 0), COALESCE(#{openOrderCount}, 0), COALESCE(#{reEvalRecommended}, FALSE),
+            CAST(COALESCE(#{aiParamAdviceJson}, 'null') AS jsonb),
+            #{aiReportMarkdown}, COALESCE(#{evaluator}, '安全评价组'), COALESCE(#{createBy}, 'admin'), CURRENT_TIMESTAMP
+        )
+    </insert>
+
+</mapper>

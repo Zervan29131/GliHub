@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glihub.ehs.mapper.EhsKnowledgeMapper">
+
+    <resultMap type="com.glihub.ehs.domain.EhsKbDocument" id="EhsKbDocumentResult">
+        <id     property="docId"        column="doc_id" />
+        <result property="noticeId"     column="notice_id" />
+        <result property="docTitle"     column="doc_title" />
+        <result property="docCategory"  column="doc_category" />
+        <result property="standardCode" column="standard_code" />
+        <result property="filePath"     column="file_path" />
+        <result property="ocrEngine"    column="ocr_engine" />
+        <result property="chunkCount"   column="chunk_count" />
+        <result property="parseStatus"  column="parse_status" />
+        <result property="createBy"     column="create_by" />
+        <result property="createTime"   column="create_time" />
+    </resultMap>
+
+    <resultMap type="com.glihub.ehs.domain.EhsKbChunk" id="EhsKbChunkResult">
+        <id     property="chunkId"          column="chunk_id" />
+        <result property="docId"            column="doc_id" />
+        <result property="docTitle"         column="doc_title" />
+        <result property="docCategory"      column="doc_category" />
+        <result property="standardCode"     column="standard_code" />
+        <result property="chunkIndex"       column="chunk_index" />
+        <result property="clauseNo"         column="clause_no" />
+        <result property="chunkText"        column="chunk_text" />
+        <result property="applicablePlaces" column="applicable_places" />
+        <result property="hazardTags"       column="hazard_tags" />
+        <result property="createTime"       column="create_time" />
+    </resultMap>
+
+    <select id="selectDocList" parameterType="com.glihub.ehs.domain.EhsKbDocument" resultMap="EhsKbDocumentResult">
+        SELECT doc_id, notice_id, doc_title, doc_category, standard_code, file_path, ocr_engine, chunk_count, parse_status, create_by, create_time
+        FROM ehs_kb_document
+        <where>
+            <if test="docTitle != null and docTitle != ''">AND doc_title ILIKE '%' || #{docTitle} || '%'</if>
+            <if test="docCategory != null and docCategory != ''">AND doc_category = #{docCategory}</if>
+        </where>
+        ORDER BY doc_id DESC
+    </select>
+
+    <select id="selectDocById" resultMap="EhsKbDocumentResult">
+        SELECT doc_id, notice_id, doc_title, doc_category, standard_code, file_path, ocr_engine, chunk_count, parse_status, create_by, create_time
+        FROM ehs_kb_document
+        WHERE doc_id = #{docId}
+    </select>
+
+    <select id="selectChunksByDocId" resultMap="EhsKbChunkResult">
+        SELECT c.chunk_id, c.doc_id, d.doc_title, d.doc_category, d.standard_code,
+               c.chunk_index, c.clause_no, c.chunk_text, c.applicable_places, c.hazard_tags, c.create_time
+        FROM ehs_kb_chunk c
+        JOIN ehs_kb_document d ON c.doc_id = d.doc_id
+        WHERE c.doc_id = #{docId}
+        ORDER BY c.chunk_index ASC
+    </select>
+
+    <select id="searchChunksFallback" resultMap="EhsKbChunkResult">
+        SELECT c.chunk_id, c.doc_id, d.doc_title, d.doc_category, d.standard_code,
+               c.chunk_index, c.clause_no, c.chunk_text, c.applicable_places, c.hazard_tags, c.create_time
+        FROM ehs_kb_chunk c
+        JOIN ehs_kb_document d ON c.doc_id = d.doc_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (c.chunk_text ILIKE '%' || #{keyword} || '%' OR c.hazard_tags ILIKE '%' || #{keyword} || '%' OR d.doc_title ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="placeType != null and placeType != ''">
+                AND c.applicable_places ILIKE '%' || #{placeType} || '%'
+            </if>
+        </where>
+        ORDER BY c.chunk_id ASC
+        LIMIT #{limit}
+    </select>
+
+    <insert id="insertDocFallback" parameterType="com.glihub.ehs.domain.EhsKbDocument" useGeneratedKeys="true" keyProperty="docId" keyColumn="doc_id">
+        INSERT INTO ehs_kb_document (notice_id, doc_title, doc_category, standard_code, file_path, ocr_engine, chunk_count, parse_status, create_by, create_time)
+        VALUES (#{noticeId}, #{docTitle}, COALESCE(#{docCategory}, 'STANDARD'), #{standardCode}, #{filePath}, 'backend_fallback', COALESCE(#{chunkCount}, 1), 'READY', COALESCE(#{createBy}, 'admin'), CURRENT_TIMESTAMP)
+    </insert>
+
+    <insert id="insertChunkFallback" parameterType="com.glihub.ehs.domain.EhsKbChunk" useGeneratedKeys="true" keyProperty="chunkId" keyColumn="chunk_id">
+        INSERT INTO ehs_kb_chunk (doc_id, chunk_index, clause_no, chunk_text, applicable_places, hazard_tags, create_time)
+        VALUES (#{docId}, COALESCE(#{chunkIndex}, 1), #{clauseNo}, #{chunkText}, COALESCE(#{applicablePlaces}, 'production,storage,auxiliary'), COALESCE(#{hazardTags}, ''), CURRENT_TIMESTAMP)
+    </insert>
+
+    <delete id="deleteDocById">
+        DELETE FROM ehs_kb_document WHERE doc_id = #{docId}
+    </delete>
+
+</mapper>

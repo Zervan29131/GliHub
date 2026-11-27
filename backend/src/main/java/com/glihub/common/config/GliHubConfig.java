@@ -30,6 +30,18 @@ public class GliHubConfig
     /** 验证码类型 */
     private static String captchaType;
 
+    /** FastAPI AI 微服务基础 URL */
+    private static String aiServiceUrl = "http://127.0.0.1:8090";
+
+    /** AI 输出目录 */
+    private static String aiOutputDir = "../ai-service/outputs";
+
+    /** 示例测试图像目录 */
+    private static String sampleImageDir = "../yolov5target-main/data/images";
+
+    /** AI 请求超时时间(ms) */
+    private static int aiTimeoutMs = 35000;
+
     public String getName()
     {
         return name;
@@ -90,33 +102,61 @@ public class GliHubConfig
         GliHubConfig.captchaType = captchaType;
     }
 
-    /**
-     * 获取导入上传路径
-     */
+    public static String getAiServiceUrl()
+    {
+        return aiServiceUrl;
+    }
+
+    public void setAiServiceUrl(String aiServiceUrl)
+    {
+        GliHubConfig.aiServiceUrl = aiServiceUrl;
+    }
+
+    public static String getAiOutputDir()
+    {
+        return aiOutputDir;
+    }
+
+    public void setAiOutputDir(String aiOutputDir)
+    {
+        GliHubConfig.aiOutputDir = aiOutputDir;
+    }
+
+    public static String getSampleImageDir()
+    {
+        return sampleImageDir;
+    }
+
+    public void setSampleImageDir(String sampleImageDir)
+    {
+        GliHubConfig.sampleImageDir = sampleImageDir;
+    }
+
+    public static int getAiTimeoutMs()
+    {
+        return aiTimeoutMs;
+    }
+
+    public void setAiTimeoutMs(int aiTimeoutMs)
+    {
+        GliHubConfig.aiTimeoutMs = aiTimeoutMs;
+    }
+
     public static String getImportPath()
     {
         return getProfile() + "/import";
     }
 
-    /**
-     * 获取头像上传路径
-     */
     public static String getAvatarPath()
     {
         return getProfile() + "/avatar";
     }
 
-    /**
-     * 获取下载路径
-     */
     public static String getDownloadPath()
     {
         return getProfile() + "/download/";
     }
 
-    /**
-     * 获取上传路径
-     */
     public static String getUploadPath()
     {
         return getProfile() + "/upload";
