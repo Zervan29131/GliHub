@@ -1,0 +1,47 @@
+# Maven & Java build outputs
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Node & Frontend build outputs
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime logs & uploaded files
+logs/
+**/logs/
+upload/
+**/upload/
+*.log
+
+# IDEs & Editors
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+*.swo
+.project
+.classpath
+.settings/
+
+# macOS & Windows OS metadata
+.DS_Store
+**/.DS_Store
+Thumbs.db
+Desktop.ini
