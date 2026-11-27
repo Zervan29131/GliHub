@@ -1,0 +1,88 @@
+# GliHub 系统配置
+glihub:
+  # 项目名称
+  name: GliHub
+  # 版本
+  version: 1.0.0
+  # 版权年份
+  copyrightYear: 2026
+  # 本地上传与导出文件存储目录
+  profile: ${GLIHUB_UPLOAD_PATH:./upload}
+  # 获取IP归属地开关
+  addressEnabled: false
+  # 验证码类型 math 数字计算 char 字符验证
+  captchaType: math
+
+# Web 服务配置
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+    accept-count: 1000
+    threads:
+      max: 800
+      min-spare: 100
+
+# 日志级别配置
+logging:
+  level:
+    com.glihub: debug
+    org.springframework: warn
+
+# 登录安全策略配置
+user:
+  password:
+    maxRetryCount: 5
+    lockTime: 10
+
+# Spring 配置
+spring:
+  messages:
+    basename: i18n/messages
+  profiles:
+    active: druid
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+  devtools:
+    restart:
+      enabled: true
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    database: ${REDIS_DB:0}
+    password: ${REDIS_PASSWORD:}
+    timeout: 10s
+    lettuce:
+      pool:
+        min-idle: 0
+        max-idle: 8
+        max-active: 8
+        max-wait: -1ms
+
+# JWT 令牌配置
+token:
+  header: Authorization
+  secret: ${JWT_SECRET:abcdefghijklmnopqrstuvwxyz}
+  expireTime: 30
+
+# MyBatis 配置
+mybatis:
+  typeAliasesPackage: com.glihub.**.domain
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  configLocation: classpath:mybatis/mybatis-config.xml
+
+# PageHelper 分页插件（PostgreSQL 方言）
+pagehelper:
+  helperDialect: postgresql
+  supportMethodsArguments: true
+  params: count=countSql
+
+# 防止 XSS 攻击
+xss:
+  enabled: true
+  excludes: /system/notice
+  urlPatterns: /system/*
