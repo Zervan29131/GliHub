@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqc.personmanagement.mapper.EmployeeMapper">
+
+    <!-- 嵌套查询处理-->
+    <resultMap id="EmployeeDepartment" type="Employee">
+        <result property="id" column="id"/>
+        <result property="lastName" column="lastName"/>
+        <result property="email" column="email"/>
+        <result property="gender" column="gender"/>
+        <result property="birth" column="birth"/>
+        <association property="department" column="department" javaType="Department" select="getDepartment"/>
+    </resultMap>
+    <select id="getDepartment" resultType="Department">
+        select * from t_department where id=#{id}
+    </select>
+
+    <select id="queryEmployeeList" resultMap="EmployeeDepartment">
+        select * from t_employee
+    </select>
+
+    <select id="queryEmployeeById" resultMap="EmployeeDepartment">
+        select * from t_employee where id = #{id}
+    </select>
+
+    <insert id="addEmployee" parameterType="Employee">
+        insert into t_employee (lastname,email,gender,department,birth) values (#{lastName},#{email},#{gender},#{department.id},#{birth})
+    </insert>
+
+    <update id="updateEmployee" parameterType="Employee">
+        update t_employee set lastname=#{lastName},email=#{email},gender=#{gender},department=#{department.id},birth=#{birth} where id=#{id}
+    </update>
+
+    <delete id="deleteEmployeeById" parameterType="int">
+        delete from t_employee where id=#{id}
+    </delete>
+</mapper>

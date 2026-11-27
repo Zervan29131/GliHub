@@ -1,0 +1,64 @@
+spring:
+  datasource:
+    # 一、mysql数据库的配置
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/pm?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+
+    # 二、整合druid
+    druid:
+      # 1.连接池配置
+      # 初始化连接池的连接数量 大小，最小，最大
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      # 是否缓存preparedStatement，也就是PSCache，官方建议MySQL下建议关闭（个人建议如果想用SQL防火墙，建议打开）
+      poolPreparedStatements: true
+
+      # 2.基础监控配置
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        #设置不统计哪些URL
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
+        session-stat-enable: true
+        session-stat-max-count: 100
+
+      # 3.
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        reset-enable: true
+        #设置监控页面的登录名和密码
+        login-username: admin
+        login-password: 123456
+        # 可访问
+        allow: 127.0.0.1
+        # 不可访问
+        #deny: 192.168.1.100
+  # 四、配置日期格式
+  mvc:
+    format:
+      date: yyyy-MM-dd
+
+# 三、整合mybatis
+mybatis:
+  # pojo所在目录
+  type-aliases-package: com.zqc.personmanagement.pojo
+  # mapper所在目录
+  mapper-locations: classpath:mapper/*.xml
+
+debug: true
+
